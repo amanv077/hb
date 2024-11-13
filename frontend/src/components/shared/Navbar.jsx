@@ -8,6 +8,7 @@ import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { setUser } from "@/redux/authSlice";
 import { toast } from "sonner";
+import logo from "@/assets/logo.jpg";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
@@ -29,46 +30,66 @@ const Navbar = () => {
       toast.error(error.response.data.message);
     }
   };
+
   return (
-    <div className="bg-white">
-      <div className="flex items-center justify-between mx-auto max-w-7xl h-16">
+    <div className="bg-white shadow-sm">
+      <div className="flex items-center justify-between mx-auto max-w-7xl h-16 px-6">
         <div>
-          <h1 className="text-2xl font-bold">
-            Hiring<span className="text-[#F83002]">Booth</span>
-          </h1>
+          <Link to="/">
+            <img
+              src={logo}
+              alt="Hiring Booth Logo"
+              className="h-10 cursor-pointer"
+            />
+          </Link>
         </div>
-        <div className="flex items-center gap-12">
-          <ul className="flex font-medium items-center gap-5">
+        <div className="flex items-center gap-10">
+          <ul className="flex items-center gap-6 text-[#004aad] font-semibold">
             {user && user.role === "recruiter" ? (
               <>
                 <li>
-                  <Link to="/admin/companies">Companies</Link>
+                  <Link to="/admin/companies" className="hover:text-[#003b8d]">
+                    Companies
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/admin/jobs">Jobs</Link>
+                  <Link to="/admin/jobs" className="hover:text-[#003b8d]">
+                    Jobs
+                  </Link>
                 </li>
               </>
             ) : (
               <>
                 <li>
-                  <Link to="/">Home</Link>
+                  <Link to="/" className="hover:text-[#003b8d]">
+                    Home
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/jobs">Jobs</Link>
+                  <Link to="/jobs" className="hover:text-[#003b8d]">
+                    Jobs
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/browse">Browse</Link>
+                  <Link to="/browse" className="hover:text-[#003b8d]">
+                    Browse
+                  </Link>
                 </li>
               </>
             )}
           </ul>
           {!user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Link to="/login">
-                <Button variant="outline">Login</Button>
+                <Button
+                  variant="outline"
+                  className="border-[#004aad] text-[#004aad] hover:bg-[#004aad] hover:text-white"
+                >
+                  Login
+                </Button>
               </Link>
               <Link to="/signup">
-                <Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">
+                <Button className="bg-[#004aad] hover:bg-[#003b8d] text-white">
                   Signup
                 </Button>
               </Link>
@@ -79,7 +100,7 @@ const Navbar = () => {
                 <Avatar className="cursor-pointer">
                   <AvatarImage
                     src={user?.profile?.profilePhoto}
-                    alt="@shadcn"
+                    alt="User Profile"
                   />
                 </Avatar>
               </PopoverTrigger>
@@ -89,27 +110,25 @@ const Navbar = () => {
                     <Avatar className="cursor-pointer">
                       <AvatarImage
                         src={user?.profile?.profilePhoto}
-                        alt="@shadcn"
+                        alt="User Profile"
                       />
                     </Avatar>
                     <div>
                       <h4 className="font-medium">{user?.fullname}</h4>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-gray-500">
                         {user?.profile?.bio}
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col my-2 text-gray-600">
+                  <div className="flex flex-col my-2 text-gray-700">
                     {user && user.role === "student" && (
                       <div className="flex w-fit items-center gap-2 cursor-pointer">
                         <User2 />
                         <Button variant="link">
-                          {" "}
                           <Link to="/profile">View Profile</Link>
                         </Button>
                       </div>
                     )}
-
                     <div className="flex w-fit items-center gap-2 cursor-pointer">
                       <LogOut />
                       <Button onClick={logoutHandler} variant="link">
