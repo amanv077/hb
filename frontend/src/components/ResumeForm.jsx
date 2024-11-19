@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import Navbar from "./shared/Navbar";
+import Footer from "./shared/Footer";
 
-const ResumeForm = () => {
+const ResumeBuilder = () => {
   const [formData, setFormData] = useState({
     name: "",
     position: "",
@@ -11,7 +14,6 @@ const ResumeForm = () => {
     education: [{ degree: "", school: "", year: "" }],
     experience: [{ position: "", company: "", duration: "", description: "" }],
     skills: [""],
-    customSections: [{ title: "Location", content: "" }],
   });
 
   useEffect(() => {
@@ -28,346 +30,213 @@ const ResumeForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const addSectionItem = (section) => {
-    setFormData({
-      ...formData,
-      [section]: [
-        ...formData[section],
-        section === "skills" ? "" : { degree: "", school: "", year: "" },
-      ],
-    });
+  const handleSectionChange = (section, index, field, value) => {
+    const updatedSection = [...formData[section]];
+    updatedSection[index][field] = value;
+    setFormData({ ...formData, [section]: updatedSection });
   };
 
-  const addCustomSection = () => {
-    setFormData({
-      ...formData,
-      customSections: [...formData.customSections, { title: "", content: "" }],
-    });
+  const addSectionItem = (section) => {
+    const emptyItem =
+      section === "skills" ? "" : { degree: "", school: "", year: "" };
+    setFormData({ ...formData, [section]: [...formData[section], emptyItem] });
+  };
+
+  const handleSkillChange = (index, value) => {
+    const updatedSkills = [...formData.skills];
+    updatedSkills[index] = value;
+    setFormData({ ...formData, skills: updatedSkills });
   };
 
   const downloadPDF = () => {
-    const pdf = new jsPDF("p", "pt", "a4");
-    pdf.setFont("Helvetica", "normal");
+    const doc = new jsPDF();
+    doc.setFont("Helvetica", "normal");
 
-    // Name and Position
-    pdf.setFontSize(20);
-    pdf.text(formData.name || "Your Name", 40, 50);
-    pdf.setFontSize(14);
-    pdf.text(formData.position || "Position Title", 40, 70);
-    pdf.setLineWidth(0.5);
-    pdf.line(40, 80, 550, 80);
+    // Title and Contact Info
+    doc.setFontSize(18);
+    doc.text(formData.name || "Your Name", 20, 20);
+    doc.setFontSize(14);
+    doc.text(formData.position || "Position Title", 20, 30);
+    doc.setFontSize(10);
+    doc.text(`Email: ${formData.email || "example@mail.com"}`, 20, 40);
+    doc.text(`Phone: ${formData.phone || "+1234567890"}`, 20, 50);
 
     // Professional Summary
-    pdf.setFontSize(16);
-    pdf.text("Professional Summary", 40, 110);
-    pdf.setFontSize(12);
-    pdf.text(
-      formData.summary || "A brief summary of your professional background.",
-      40,
-      130
-    );
-    pdf.line(40, 140, 550, 140);
+    if (formData.summary) {
+      doc.setFontSize(12);
+      doc.text("Professional Summary", 20, 60);
+      doc.setFontSize(10);
+      doc.text(doc.splitTextToSize(formData.summary, 180), 20, 70);
+    }
 
-    // Education
-    pdf.setFontSize(16);
-    pdf.text("Education", 40, 170);
-    formData.education.forEach((edu, index) => {
-      const y = 190 + index * 30;
-      pdf.setFontSize(12);
-      pdf.text(`${edu.degree || "Degree"} - ${edu.school || "School"}`, 40, y);
-      pdf.text(edu.year || "Year", 450, y, { align: "right" });
-    });
-    pdf.line(
-      40,
-      210 + formData.education.length * 30,
-      550,
-      210 + formData.education.length * 30
-    );
-
-    // Experience
-    const experienceStartY = 220 + formData.education.length * 30;
-    pdf.setFontSize(16);
-    pdf.text("Experience", 40, experienceStartY);
-    formData.experience.forEach((exp, index) => {
-      const y = experienceStartY + 20 + index * 60;
-      pdf.setFontSize(12);
-      pdf.text(
-        `${exp.position || "Position"} at ${exp.company || "Company"}`,
-        40,
-        y
-      );
-      pdf.text(exp.duration || "Duration", 450, y, { align: "right" });
-      pdf.text(
-        exp.description || "Description of responsibilities and achievements.",
-        40,
-        y + 20,
-        { maxWidth: 450 }
-      );
-    });
-    pdf.line(
-      40,
-      experienceStartY + formData.experience.length * 60 + 20,
-      550,
-      experienceStartY + formData.experience.length * 60 + 20
-    );
-
-    // Skills
-    const skillsStartY =
-      experienceStartY + formData.experience.length * 60 + 40;
-    pdf.setFontSize(16);
-    pdf.text("Skills", 40, skillsStartY);
-    formData.skills.forEach((skill, index) => {
-      pdf.text(`- ${skill || "Skill"}`, 40, skillsStartY + 20 + index * 20);
-    });
-
-    // Custom Sections
-    const customSectionStartY = skillsStartY + 40 + formData.skills.length * 20;
-    formData.customSections.forEach((section, index) => {
-      const y = customSectionStartY + index * 40;
-      pdf.setFontSize(16);
-      pdf.text(section.title || "Section Title", 40, y);
-      pdf.setFontSize(12);
-      pdf.text(section.content || "Section content...", 40, y + 20, {
-        maxWidth: 450,
+    // Education Section
+    if (formData.education.length) {
+      doc.setFontSize(12);
+      doc.text("Education", 20, 90);
+      formData.education.forEach((edu, index) => {
+        doc.setFontSize(10);
+        const eduText = `${edu.degree || "Degree"} - ${
+          edu.school || "School"
+        } (${edu.year || "Year"})`;
+        doc.text(eduText, 20, 100 + index * 10);
       });
-    });
+    }
 
-    pdf.save("resume.pdf");
+    // Experience Section
+    if (formData.experience.length) {
+      doc.setFontSize(12);
+      doc.text("Experience", 20, 120);
+      formData.experience.forEach((exp, index) => {
+        doc.setFontSize(10);
+        const expText = `${exp.position || "Position"} at ${
+          exp.company || "Company"
+        } (${exp.duration || "Duration"})`;
+        const desc = exp.description || "Description";
+        doc.text(expText, 20, 130 + index * 20);
+        doc.text(doc.splitTextToSize(desc, 160), 20, 140 + index * 20);
+      });
+    }
+
+    // Skills Section
+    if (formData.skills.length) {
+      doc.setFontSize(12);
+      doc.text("Skills", 20, 160);
+      formData.skills.forEach((skill, index) => {
+        doc.setFontSize(10);
+        doc.text(`${index + 1}. ${skill}`, 20, 170 + index * 10);
+      });
+    }
+
+    doc.save("resume.pdf");
   };
 
   return (
-    <div className="container mx-auto p-8 bg-gray-50 min-h-screen">
-      <h1 className="text-4xl font-bold mb-6 text-center">
-        Premium Resume Builder
-      </h1>
+    <div className="bg-gray-100 min-h-screen">
+      <Navbar />
+      <div className="container mx-auto py-10 px-6">
+        <h1 className="text-4xl font-bold text-center text-blue-600 mb-10">
+          Modern Resume Builder
+        </h1>
 
-      <div className="flex gap-10">
-        {/* Left Section (Form Inputs) */}
-        <form className="w-1/2 space-y-6 bg-white p-6 rounded shadow-md">
-          <h2 className="text-2xl font-semibold">Enter Your Details</h2>
+        <form className="bg-white shadow rounded-lg p-6 space-y-8">
+          {/* Personal Info */}
+          <section>
+            <h2 className="text-2xl font-semibold mb-4">
+              Personal Information
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={handleChange}
+                className="border rounded-lg p-3"
+              />
+              <input
+                type="text"
+                name="position"
+                placeholder="Position Title"
+                value={formData.position}
+                onChange={handleChange}
+                className="border rounded-lg p-3"
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="border rounded-lg p-3"
+              />
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={handleChange}
+                className="border rounded-lg p-3"
+              />
+            </div>
+          </section>
 
-          {/* Basic Info */}
-          <input
-            name="name"
-            placeholder="Full Name"
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-          />
-          <input
-            name="position"
-            placeholder="Position Title"
-            value={formData.position}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-          />
-          <input
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-          />
-          <input
-            name="phone"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-          />
-
-          {/* Summary */}
-          <textarea
-            name="summary"
-            placeholder="Professional Summary"
-            value={formData.summary}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
-            rows="3"
-          />
-
-          {/* Dynamic Sections */}
-          {["Education", "Experience", "Skills"].map((section) => (
-            <div key={section}>
-              <h3 className="text-xl font-semibold">{section}</h3>
-              {formData[section.toLowerCase()].map((item, index) => (
-                <div key={index} className="space-y-2">
-                  {section !== "Skills" ? (
-                    <>
-                      <input
-                        placeholder={`${
-                          section === "Education" ? "Degree" : "Position"
-                        }`}
-                        value={item.degree || item.position || ""}
-                        onChange={(e) => {
-                          const updatedSection = [
-                            ...formData[section.toLowerCase()],
-                          ];
-                          updatedSection[index][
-                            section === "Education" ? "degree" : "position"
-                          ] = e.target.value;
-                          setFormData({
-                            ...formData,
-                            [section.toLowerCase()]: updatedSection,
-                          });
-                        }}
-                        className="w-full p-2 border border-gray-300 rounded"
-                      />
-                      <input
-                        placeholder={
-                          section === "Education" ? "School" : "Company"
-                        }
-                        value={item.school || item.company || ""}
-                        onChange={(e) => {
-                          const updatedSection = [
-                            ...formData[section.toLowerCase()],
-                          ];
-                          updatedSection[index][
-                            section === "Education" ? "school" : "company"
-                          ] = e.target.value;
-                          setFormData({
-                            ...formData,
-                            [section.toLowerCase()]: updatedSection,
-                          });
-                        }}
-                        className="w-full p-2 border border-gray-300 rounded"
-                      />
-                      <input
-                        placeholder={
-                          section === "Education" ? "Year" : "Duration"
-                        }
-                        value={item.year || item.duration || ""}
-                        onChange={(e) => {
-                          const updatedSection = [
-                            ...formData[section.toLowerCase()],
-                          ];
-                          updatedSection[index][
-                            section === "Education" ? "year" : "duration"
-                          ] = e.target.value;
-                          setFormData({
-                            ...formData,
-                            [section.toLowerCase()]: updatedSection,
-                          });
-                        }}
-                        className="w-full p-2 border border-gray-300 rounded"
-                      />
-                    </>
-                  ) : (
-                    <input
-                      placeholder="Skill"
-                      value={item || ""}
-                      onChange={(e) => {
-                        const updatedSkills = [...formData.skills];
-                        updatedSkills[index] = e.target.value;
-                        setFormData({ ...formData, skills: updatedSkills });
-                      }}
-                      className="w-full p-2 border border-gray-300 rounded"
-                    />
-                  )}
-                </div>
-              ))}
+          {/* Sections */}
+          {["education", "experience"].map((section) => (
+            <section key={section}>
+              <h2 className="text-2xl font-semibold capitalize">{section}</h2>
               <button
                 type="button"
-                onClick={() => addSectionItem(section.toLowerCase())}
-                className="mt-2 px-3 py-1 bg-blue-500 text-white rounded"
+                onClick={() => addSectionItem(section)}
+                className="text-blue-500 mt-2"
               >
                 Add {section}
               </button>
-            </div>
+              <div className="space-y-4 mt-4">
+                {formData[section].map((item, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-gray-100 p-4 rounded-lg"
+                  >
+                    {Object.keys(item).map((field) => (
+                      <input
+                        key={field}
+                        type="text"
+                        placeholder={field}
+                        value={item[field]}
+                        onChange={(e) =>
+                          handleSectionChange(
+                            section,
+                            index,
+                            field,
+                            e.target.value
+                          )
+                        }
+                        className="border rounded-lg p-3"
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </section>
           ))}
 
-          {/* Custom Section */}
-          {formData.customSections.map((section, index) => (
-            <div key={index} className="space-y-2 mt-4">
-              <input
-                name="title"
-                placeholder="Custom Section Title"
-                value={section.title}
-                onChange={(e) => {
-                  const updatedSections = [...formData.customSections];
-                  updatedSections[index].title = e.target.value;
-                  setFormData({ ...formData, customSections: updatedSections });
-                }}
-                className="w-full p-3 border border-gray-300 rounded"
-              />
-              <textarea
-                name="content"
-                placeholder="Content"
-                value={section.content}
-                onChange={(e) => {
-                  const updatedSections = [...formData.customSections];
-                  updatedSections[index].content = e.target.value;
-                  setFormData({ ...formData, customSections: updatedSections });
-                }}
-                className="w-full p-3 border border-gray-300 rounded"
-              />
+          {/* Skills */}
+          <section>
+            <h2 className="text-2xl font-semibold">Skills</h2>
+            <button
+              type="button"
+              onClick={() => addSectionItem("skills")}
+              className="text-blue-500 mt-2"
+            >
+              Add Skill
+            </button>
+            <div className="space-y-4 mt-4">
+              {formData.skills.map((skill, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  placeholder="Skill"
+                  value={skill}
+                  onChange={(e) => handleSkillChange(index, e.target.value)}
+                  className="border rounded-lg p-3"
+                />
+              ))}
             </div>
-          ))}
-          <button
-            type="button"
-            onClick={addCustomSection}
-            className="mt-2 px-3 py-1 bg-blue-500 text-white rounded"
-          >
-            Add Custom Section
-          </button>
+          </section>
 
           {/* Download Button */}
           <button
             type="button"
             onClick={downloadPDF}
-            className="mt-4 px-6 py-2 bg-green-500 text-white rounded"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg"
           >
-            Download Resume as PDF
+            Download Resume
           </button>
         </form>
-
-        {/* Right Section (Live Preview) */}
-        <div className="w-1/2 bg-white p-6 rounded shadow-md">
-          <h2 className="text-2xl font-semibold mb-4">Live Preview</h2>
-          <div className="text-lg">
-            <p className="font-bold">{formData.name}</p>
-            <p className="text-sm">{formData.position}</p>
-            <p>{formData.summary}</p>
-            <hr className="my-4" />
-            <h3 className="font-bold">Education</h3>
-            {formData.education.map((edu, index) => (
-              <div key={index}>
-                <p>
-                  {edu.degree} - {edu.school}
-                </p>
-                <p>{edu.year}</p>
-              </div>
-            ))}
-            <hr className="my-4" />
-            <h3 className="font-bold">Experience</h3>
-            {formData.experience.map((exp, index) => (
-              <div key={index}>
-                <p>
-                  {exp.position} at {exp.company}
-                </p>
-                <p>{exp.duration}</p>
-                <p>{exp.description}</p>
-              </div>
-            ))}
-            <hr className="my-4" />
-            <h3 className="font-bold">Skills</h3>
-            <ul>
-              {formData.skills.map((skill, index) => (
-                <li key={index}>{skill}</li>
-              ))}
-            </ul>
-            <hr className="my-4" />
-            {formData.customSections.map((section, index) => (
-              <div key={index}>
-                <h3 className="font-bold">{section.title}</h3>
-                <p>{section.content}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
+      <Footer />
     </div>
   );
 };
 
-export default ResumeForm;
+export default ResumeBuilder;

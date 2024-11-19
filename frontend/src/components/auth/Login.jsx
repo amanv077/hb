@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { RadioGroup } from "../ui/radio-group";
 import { Button } from "../ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -95,34 +94,18 @@ const Login = () => {
             {/* Role Selection */}
             <div>
               <Label className="text-sm font-medium text-gray-700">Role</Label>
-              <RadioGroup className="flex space-x-4">
-                <div className="flex items-center">
-                  <Input
-                    type="radio"
-                    name="role"
-                    value="student"
-                    checked={input.role === "student"}
-                    onChange={changeEventHandler}
-                    className="h-5 w-5 text-blue-500"
-                  />
-                  <Label htmlFor="r1" className="ml-2 text-gray-700">
-                    Candidate
-                  </Label>
-                </div>
-                <div className="flex items-center">
-                  <Input
-                    type="radio"
-                    name="role"
-                    value="recruiter"
-                    checked={input.role === "recruiter"}
-                    onChange={changeEventHandler}
-                    className="h-5 w-5 text-blue-500"
-                  />
-                  <Label htmlFor="r2" className="ml-2 text-gray-700">
-                    Recruiter
-                  </Label>
-                </div>
-              </RadioGroup>
+              <select
+                name="role"
+                value={input.role}
+                onChange={changeEventHandler}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-300 ease-in-out bg-white text-gray-700"
+              >
+                <option value="" disabled>
+                  Select your role
+                </option>
+                <option value="student">Candidate</option>
+                <option value="recruiter">Recruiter</option>
+              </select>
             </div>
 
             {/* Submit Button */}
