@@ -69,6 +69,43 @@ export const getCompanyById = async (req, res) => {
     console.log(error);
   }
 };
+
+export const deleteCompany = async (req, res) => {
+  try {
+    const companyId = req.params.id;
+
+    // Check if companyId is valid
+    if (!companyId) {
+      return res.status(400).json({
+        message: "Company ID is required.",
+        success: false,
+      });
+    }
+
+    // Find the company by ID and delete it
+    const company = await Company.findByIdAndDelete(companyId);
+
+    // If company not found, return an error
+    if (!company) {
+      return res.status(404).json({
+        message: "Company not found.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Company deleted successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.log("Error in deleteCompany:", error); // Log error for debugging
+    return res.status(500).json({
+      message: "An error occurred while deleting the company.",
+      success: false,
+    });
+  }
+};
+
 export const updateCompany = async (req, res) => {
   try {
     const { name, description, website, location } = req.body;

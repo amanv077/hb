@@ -10,14 +10,17 @@ import {
   TableRow,
 } from "../ui/table";
 import { Avatar, AvatarImage } from "../ui/avatar";
-import { Edit2 } from "lucide-react";
-import { useSelector } from "react-redux";
+import { Edit2, Trash } from "lucide-react"; // Import Trash icon
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { deleteCompany } from "../../redux/companySlice"; // Import delete action (make sure this exists in your store)
+import axios from "axios";
 
 const CompaniesTable = () => {
   const { companies, searchCompanyByText } = useSelector(
     (store) => store.company
   );
+  const dispatch = useDispatch();
   const [filterCompany, setFilterCompany] = useState(companies);
   const navigate = useNavigate();
 
@@ -34,6 +37,31 @@ const CompaniesTable = () => {
       });
     setFilterCompany(filteredCompany);
   }, [companies, searchCompanyByText]);
+
+  // Delete company handler
+  const handleDelete = async (companyId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this company?"
+    );
+    if (confirmDelete) {
+      try {
+        // Send the DELETE request to the API
+        await axios.delete(`/companies/${companyId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Add token if authentication is required
+          },
+        });
+
+        // Dispatch the delete action to remove it from the state
+        dispatch(deleteCompany(companyId));
+
+        alert("Company deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting company:", error);
+        alert("Failed to delete company.");
+      }
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
@@ -87,14 +115,23 @@ const CompaniesTable = () => {
 
               {/* Actions */}
               <TableCell className="py-4">
-                {/* Align button to the left with some margin */}
-                <div className="flex justify-end ml-4">
+                <div className="flex justify-end ml-4 space-x-2">
+                  {/* Edit Button */}
                   <button
                     onClick={() => navigate(`/admin/companies/${company._id}`)}
                     className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
                   >
                     <Edit2 className="w-4 h-4" />
                     <span>Edit</span>
+                  </button>
+
+                  {/* Delete Button */}
+                  <button
+                    onClick={() => handleDelete(company._id)}
+                    className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300"
+                  >
+                    <Trash className="w-4 h-4" />
+                    <span>Delete</span>
                   </button>
                 </div>
               </TableCell>
