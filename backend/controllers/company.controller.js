@@ -71,6 +71,7 @@ export const getCompanyById = async (req, res) => {
 };
 
 export const deleteCompany = async (req, res) => {
+  console.log("DeleteCompany Endpoint");
   try {
     const companyId = req.params.id;
 

@@ -24,6 +24,6 @@ router.route("/get/:id").get(isAuthenticated, getCompanyById);
 router.route("/update/:id").put(isAuthenticated, singleUpload, updateCompany);
 
 // Delete company by ID
-router.route("/:id").delete(isAuthenticated, deleteCompany);
+router.route("/companies/:id").delete(isAuthenticated, deleteCompany);
 
 export default router;

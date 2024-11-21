@@ -15,6 +15,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { deleteCompany } from "../../redux/companySlice"; // Import delete action (make sure this exists in your store)
 import axios from "axios";
+import { COMPANY_API_END_POINT } from "@/utils/constant";
 
 const CompaniesTable = () => {
   const { companies, searchCompanyByText } = useSelector(
@@ -44,13 +45,23 @@ const CompaniesTable = () => {
       "Are you sure you want to delete this company?"
     );
     if (confirmDelete) {
+      // try {
+      //   // Send the DELETE request to the API
+      //   await axios.delete(`${COMPANY_API_END_POINT}/companies/${companyId}`, {
+      //     headers: {
+      //       Authorization: `Bearer ${localStorage.getItem("token")}`, // Add token if authentication is required
+      //     },
+      //   });
       try {
-        // Send the DELETE request to the API
-        await axios.delete(`/companies/${companyId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Add token if authentication is required
-          },
-        });
+        const res = await axios.delete(
+          `${COMPANY_API_END_POINT}/companies/${companyId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
 
         // Dispatch the delete action to remove it from the state
         dispatch(deleteCompany(companyId));
