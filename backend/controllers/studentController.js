@@ -41,11 +41,11 @@ export const getStudents = async (req, res) => {
     const { name, email, city, state, page = 1, limit = 10 } = req.query; // Extract query params
     const filters = {};
 
-    // Apply filters if present
-    if (name) filters.name = new RegExp(name, "i"); // Case-insensitive regex search
-    if (email) filters.email = email;
-    if (city) filters.city = city;
-    if (state) filters.state = state;
+    // Normalize the filter inputs to lowercase and trim excess spaces
+    if (name) filters.name = new RegExp(name.trim().replace(/\s+/g, " "), "i"); // Case-insensitive regex search
+    if (email) filters.email = new RegExp(email.toLowerCase().trim(), "i");
+    if (city) filters.city = new RegExp(city.toLowerCase().trim(), "i");
+    if (state) filters.state = new RegExp(state.toLowerCase().trim(), "i");
 
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;

@@ -9,7 +9,7 @@ const StudentCard = ({ student, onClick }) => {
       <h2 className="text-lg font-semibold text-blue-700">{student.name}</h2>
       <p className="text-gray-500">{`${student.city}, ${student.state}`}</p>
       <p className="text-gray-600">{student.mobile}</p>
-      <p className="text-gray-600">{student.email}</p>
+      <p className="text-gray-600 overflow-hidden">{student.email}</p>
     </div>
   );
 };

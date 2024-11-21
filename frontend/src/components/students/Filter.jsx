@@ -11,13 +11,15 @@ const Filter = ({ onSearch }) => {
     experience: "",
   });
 
+  // Normalize filters to lowercase and remove unwanted spaces
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    const normalizedValue = value.trim().replace(/\s+/g, " ").toLowerCase(); // Normalize spaces and case
+    setFilters((prev) => ({ ...prev, [name]: normalizedValue }));
   };
 
   const handleSearch = () => {
-    onSearch(filters);
+    onSearch(filters); // Pass updated filters to the parent
   };
 
   const handleReset = () => {
@@ -31,13 +33,13 @@ const Filter = ({ onSearch }) => {
       experience: "",
     };
     setFilters(resetFilters);
-    onSearch(resetFilters);
+    onSearch(resetFilters); // Reset the parent search as well
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-      <h3 className="text-xl font-bold text-gray-800">Search Filters</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+    <div className="bg-white shadow-md rounded-lg p-6">
+      <h3 className="text-xl font-bold text-gray-800 mb-4">Search Filters</h3>
+      <div className="grid grid-cols-1 gap-4">
         <input
           type="text"
           name="name"
