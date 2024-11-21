@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Navbar from "../shared/Navbar";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
@@ -20,7 +19,6 @@ const AdminJobs = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <div className="max-w-7xl mx-auto p-6">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">

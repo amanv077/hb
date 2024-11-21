@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -64,7 +63,6 @@ const CompanyCreate = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      <Navbar />
       <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
           <h1 className="text-3xl font-semibold text-gray-800">

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -89,7 +88,6 @@ const PostJob = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      <Navbar />
       <div className="flex justify-center my-10 px-5">
         <div className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg">
           <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">

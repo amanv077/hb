@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -56,7 +55,6 @@ const Login = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
-      <Navbar />
       <div className="flex justify-center items-center py-12">
         <div className="bg-white w-full max-w-md p-8 rounded-lg shadow-xl">
           <h1 className="text-2xl font-bold text-center text-gray-800 mb-8">

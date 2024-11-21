@@ -7,8 +7,9 @@ import userRoute from "./routes/user.route.js";
 import companyRoute from "./routes/company.route.js";
 import jobRoute from "./routes/job.route.js";
 import applicationRoute from "./routes/application.route.js";
+import studentsRoute from "./routes/student.route.js";
 
-dotenv.config({});
+dotenv.config();
 
 const app = express();
 
@@ -30,6 +31,21 @@ app.use("/api/v1/user", userRoute);
 app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
+app.use("/api/v1/students", studentsRoute);
+
+// Catch-all route for undefined routes
+app.use((req, res, next) => {
+  res.status(404).json({ message: "Route not found." });
+});
+
+// Generic error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Log error stack
+  res.status(500).json({
+    message: "Internal Server Error",
+    success: false,
+  });
+});
 
 app.listen(PORT, () => {
   connectDB();

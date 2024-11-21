@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Navbar from "./shared/Navbar";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Contact, Mail, Pen } from "lucide-react";
@@ -19,7 +18,6 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-8 mt-8">
         {/* Profile Header */}
         <div className="flex justify-between items-center mb-8">

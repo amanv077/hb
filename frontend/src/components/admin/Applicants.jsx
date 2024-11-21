@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import Navbar from "../shared/Navbar";
 import ApplicantsTable from "./ApplicantsTable";
 import axios from "axios";
 import { APPLICATION_API_END_POINT } from "@/utils/constant";
@@ -29,7 +28,6 @@ const Applicants = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
-      <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Heading Section */}
         <div className="bg-white shadow-lg rounded-lg p-6 mb-8">

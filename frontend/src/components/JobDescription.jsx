@@ -7,8 +7,6 @@ import { APPLICATION_API_END_POINT, JOB_API_END_POINT } from "@/utils/constant";
 import { setSingleJob } from "@/redux/jobSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import Navbar from "./shared/Navbar";
-import Footer from "./shared/Footer";
 
 const JobDescription = () => {
   const { singleJob } = useSelector((store) => store.job);
@@ -68,8 +66,6 @@ const JobDescription = () => {
 
   return (
     <div>
-      <Navbar />
-
       <div className="bg-gray-100 min-h-screen py-10">
         <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
           {/* Back Button */}
@@ -188,7 +184,6 @@ const JobDescription = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

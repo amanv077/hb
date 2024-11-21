@@ -53,6 +53,11 @@ const Navbar = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/admin/students" className="hover:text-[#003b8d]">
+                    Students
+                  </Link>
+                </li>
+                <li>
                   <Link to="/admin/jobs" className="hover:text-[#003b8d]">
                     Jobs
                   </Link>

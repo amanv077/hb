@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../shared/Navbar";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { RadioGroup } from "../ui/radio-group";
@@ -106,7 +105,6 @@ const Signup = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col">
-      <Navbar />
       <div className="flex justify-center items-center py-12">
         <div className="bg-white w-full max-w-md p-8 rounded-lg shadow-lg">
           <h1 className="text-2xl font-bold text-center text-gray-800 mb-8">

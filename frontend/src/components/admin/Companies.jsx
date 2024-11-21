@@ -21,9 +21,6 @@ const Companies = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      {/* Navbar */}
-      <Navbar />
-
       {/* Header Section */}
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="mb-8">

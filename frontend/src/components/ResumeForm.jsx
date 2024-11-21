@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Navbar from "./shared/Navbar";
 import Footer from "./shared/Footer";
 
 const ResumeBuilder = () => {
@@ -112,7 +111,6 @@ const ResumeBuilder = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <Navbar />
       <div className="container mx-auto py-10 px-6">
         <h1 className="text-4xl font-bold text-center text-blue-600 mb-10">
           Modern Resume Builder
@@ -234,7 +232,6 @@ const ResumeBuilder = () => {
           </button>
         </form>
       </div>
-      <Footer />
     </div>
   );
 };

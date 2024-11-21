@@ -1,6 +1,5 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import Navbar from "../shared/Navbar";
 import { Button } from "../ui/button";
 import { ArrowLeft, Loader2, Home, MapPin, Link, Edit } from "lucide-react";
 import { Label } from "../ui/label";
@@ -101,8 +100,6 @@ const CompanySetup = () => {
 
   return (
     <div>
-      <Navbar />
-
       <div className="bg-white shadow-lg rounded-lg p-6 max-w-4xl mx-auto my-10">
         <form onSubmit={submitHandler}>
           <div className="flex items-center gap-5 p-6 mb-6 bg-blue-50 rounded-lg">
