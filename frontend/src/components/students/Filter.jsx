@@ -11,10 +11,18 @@ const Filter = ({ onSearch }) => {
     experience: "",
   });
 
-  // Normalize filters to lowercase and remove unwanted spaces
+  // Normalize filters and handle skill input as an array of skills
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const normalizedValue = value.trim().replace(/\s+/g, " ").toLowerCase(); // Normalize spaces and case
+    let normalizedValue = value.trim().replace(/\s+/g, " "); // Normalize spaces
+
+    // Split skills into an array of skills if the input is for skills
+    if (name === "skills") {
+      normalizedValue = normalizedValue
+        .split(",") // Split by commas
+        .map((skill) => skill.trim().toLowerCase()); // Trim and convert to lowercase
+    }
+
     setFilters((prev) => ({ ...prev, [name]: normalizedValue }));
   };
 

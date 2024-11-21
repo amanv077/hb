@@ -38,14 +38,31 @@ export const createStudent = async (req, res) => {
 // Fetch all students with optional filters and pagination
 export const getStudents = async (req, res) => {
   try {
-    const { name, email, city, state, page = 1, limit = 10 } = req.query; // Extract query params
+    const {
+      name,
+      email,
+      city,
+      state,
+      skills,
+      experience,
+      page = 1,
+      limit = 10,
+    } = req.query; // Extract query params
     const filters = {};
 
     // Normalize the filter inputs to lowercase and trim excess spaces
-    if (name) filters.name = new RegExp(name.trim().replace(/\s+/g, " "), "i"); // Case-insensitive regex search
+    if (name) filters.name = new RegExp(name.trim().replace(/\s+/g, " "), "i");
     if (email) filters.email = new RegExp(email.toLowerCase().trim(), "i");
     if (city) filters.city = new RegExp(city.toLowerCase().trim(), "i");
     if (state) filters.state = new RegExp(state.toLowerCase().trim(), "i");
+
+    // Handle skills array filter
+    if (skills && skills.length > 0) {
+      const skillsArray = skills
+        .split(",")
+        .map((skill) => skill.trim().toLowerCase()); // Split and normalize
+      filters.skills = { $in: skillsArray }; // MongoDB $in operator to match any skill in the array
+    }
 
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
