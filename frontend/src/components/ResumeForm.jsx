@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Footer from "./shared/Footer";
 
 const ResumeBuilder = () => {
   const [formData, setFormData] = useState({
