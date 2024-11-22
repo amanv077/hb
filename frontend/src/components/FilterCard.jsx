@@ -1,95 +1,140 @@
 import { useEffect, useState } from "react";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-import { Label } from "./ui/label";
 import { useDispatch } from "react-redux";
 import { setSearchedQuery } from "@/redux/jobSlice";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 const FilterCard = () => {
-  const [selectedValue, setSelectedValue] = useState("");
+  const [filters, setFilters] = useState({
+    jobRole: "",
+    company: "",
+    workType: "",
+    postedOn: "",
+    minSalary: "",
+    maxSalary: "",
+  });
+
   const dispatch = useDispatch();
 
-  const changeHandler = (value) => {
-    setSelectedValue(value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const applyFilters = () => {
+    dispatch(setSearchedQuery(filters)); // Send all filters to Redux
   };
 
   const resetFilters = () => {
-    setSelectedValue(""); // Reset selected filter
-    dispatch(setSearchedQuery("")); // Reset the search query in Redux
+    setFilters({
+      jobRole: "",
+      company: "",
+      workType: "",
+      postedOn: "",
+      minSalary: "",
+      maxSalary: "",
+    });
+    dispatch(setSearchedQuery({})); // Reset Redux query
   };
 
-  useEffect(() => {
-    dispatch(setSearchedQuery(selectedValue));
-  }, [selectedValue, dispatch]);
-
   return (
-    <div className="w-full bg-white p-6 rounded-md shadow-md">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="font-semibold text-xl text-gray-800">Filter Jobs</h1>
-        {/* Reset Button */}
+    <div className="bg-white p-6 rounded-md shadow-md w-full">
+      <h2 className="font-semibold text-xl mb-4">Filter Jobs</h2>
+      <div className="space-y-4">
+        {/* Job Role */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Job Role
+          </label>
+          <Input
+            name="jobRole"
+            value={filters.jobRole}
+            onChange={handleChange}
+            placeholder="Enter job role (e.g., Developer)"
+          />
+        </div>
+
+        {/* Company */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Company
+          </label>
+          <Input
+            name="company"
+            value={filters.company}
+            onChange={handleChange}
+            placeholder="Enter company name"
+          />
+        </div>
+
+        {/* Work Type */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Work Type
+          </label>
+          <select
+            name="workType"
+            value={filters.workType}
+            onChange={handleChange}
+            className="block w-full border-gray-300 rounded-md"
+          >
+            <option value="">Select</option>
+            <option value="remote">Remote</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="onsite">Onsite</option>
+          </select>
+        </div>
+
+        {/* Posted On */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Posted On
+          </label>
+          <Input
+            name="postedOn"
+            type="date"
+            value={filters.postedOn}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Salary Range */}
+        <div className="flex gap-2">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Min Salary
+            </label>
+            <Input
+              name="minSalary"
+              type="number"
+              value={filters.minSalary}
+              onChange={handleChange}
+              placeholder="e.g., 50000"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Max Salary
+            </label>
+            <Input
+              name="maxSalary"
+              type="number"
+              value={filters.maxSalary}
+              onChange={handleChange}
+              placeholder="e.g., 150000"
+            />
+          </div>
+        </div>
       </div>
-      <button
-        onClick={resetFilters}
-        className="text-sm text-blue-500 hover:text-blue-700 font-medium"
-      >
-        Reset Filters
-      </button>
-      <hr className="my-3 border-gray-300" />
 
-      {/* Location Filter */}
-      <RadioGroup value={selectedValue} onValueChange={changeHandler}>
-        <div className="mb-6">
-          <h2 className="font-semibold text-lg text-gray-700 mb-2">Location</h2>
-          {["Delhi NCR", "Bangalore", "Hyderabad", "Pune", "Mumbai"].map(
-            (item, idx) => {
-              const itemId = `location-${idx}`;
-              return (
-                <div key={itemId} className="flex items-center space-x-2 my-2">
-                  <RadioGroupItem value={item} id={itemId} />
-                  <Label htmlFor={itemId} className="text-gray-600">
-                    {item}
-                  </Label>
-                </div>
-              );
-            }
-          )}
-        </div>
-
-        {/* Industry Filter */}
-        <div className="mb-6">
-          <h2 className="font-semibold text-lg text-gray-700 mb-2">Industry</h2>
-          {[
-            "Frontend Developer",
-            "Backend Developer",
-            "FullStack Developer",
-          ].map((item, idx) => {
-            const itemId = `industry-${idx}`;
-            return (
-              <div key={itemId} className="flex items-center space-x-2 my-2">
-                <RadioGroupItem value={item} id={itemId} />
-                <Label htmlFor={itemId} className="text-gray-600">
-                  {item}
-                </Label>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Salary Filter */}
-        <div className="mb-6">
-          <h2 className="font-semibold text-lg text-gray-700 mb-2">Salary</h2>
-          {["0-40k", "42-1lakh", "1lakh to 5lakh"].map((item, idx) => {
-            const itemId = `salary-${idx}`;
-            return (
-              <div key={itemId} className="flex items-center space-x-2 my-2">
-                <RadioGroupItem value={item} id={itemId} />
-                <Label htmlFor={itemId} className="text-gray-600">
-                  {item}
-                </Label>
-              </div>
-            );
-          })}
-        </div>
-      </RadioGroup>
+      <div className="mt-6 flex justify-between">
+        <Button variant="outline" onClick={resetFilters}>
+          Reset
+        </Button>
+        <Button variant="solid" onClick={applyFilters}>
+          Apply Filters
+        </Button>
+      </div>
     </div>
   );
 };

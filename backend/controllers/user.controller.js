@@ -145,16 +145,15 @@ export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
 
-    const file = req.file;
-    const fileUri = getDataUri(file);
+    const file = req.file; // Check if a file is uploaded (optional)
     const cloudResponse = file
-      ? await cloudinary.uploader.upload(fileUri.content)
+      ? await cloudinary.uploader.upload(getDataUri(file).content) // Only upload if a file is provided
       : null;
 
-    const skillsArray = skills ? skills.split(",") : null;
-    const userId = req.id; // Middleware authentication
+    const skillsArray = skills ? skills.split(",") : null; // Split skills if provided
+    const userId = req.id; // Middleware authentication to get userId
 
-    let user = await User.findById(userId);
+    let user = await User.findById(userId); // Fetch the user from the database
     if (!user) {
       return res.status(404).json({
         message: "User not found.",
@@ -162,18 +161,20 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-    // Update user data
+    // Update user fields if provided
     if (fullname) user.fullname = fullname;
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
     if (skillsArray) user.profile.skills = skillsArray;
+
+    // If a new resume is uploaded, update it
     if (cloudResponse) {
       user.profile.resume = cloudResponse.secure_url;
-      user.profile.resumeOriginalName = file.originalname;
+      user.profile.resumeOriginalName = file.originalname; // Store the original file name
     }
 
-    await user.save();
+    await user.save(); // Save the updated user data
 
     return res.status(200).json({
       message: "Profile updated successfully.",
