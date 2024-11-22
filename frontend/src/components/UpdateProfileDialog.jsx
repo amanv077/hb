@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, Trash } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
@@ -20,14 +20,13 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
   const [loading, setLoading] = useState(false);
   const { user } = useSelector((store) => store.auth);
 
-  // Initialize the input state with the user data
   const [input, setInput] = useState({
     fullname: user?.fullname || "",
     email: user?.email || "",
     phoneNumber: user?.phoneNumber || "",
     bio: user?.profile?.bio || "",
     skills: user?.profile?.skills?.join(", ") || "",
-    file: null, // Resume file, initially null
+    file: null,
     dob: user?.additionalInfo?.dob || "",
     gender: user?.additionalInfo?.gender || "",
     fatherName: user?.additionalInfo?.fatherName || "",
@@ -35,23 +34,41 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     city: user?.additionalInfo?.city || "",
     state: user?.additionalInfo?.state || "",
     highestQualification: user?.additionalInfo?.highestQualification || "",
-    experience: user?.additionalInfo?.experience || [],
-    education: user?.additionalInfo?.education || [],
-    profilePhoto: user?.profile?.profilePhoto || "",
+    experience: user?.profile?.experience || [],
+    education: user?.profile?.education || [],
   });
 
   const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
 
-  const changeEventHandler = (e) => {
+  const handleChange = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); // Clear error when value changes
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  const fileChangeHandler = (e) => {
-    const file = e.target.files?.[0];
-    setInput({ ...input, file });
+  const handleFileChange = (e) => {
+    setInput({ ...input, file: e.target.files?.[0] });
     setErrors({ ...errors, file: "" });
+  };
+
+  const handleListChange = (type, index, key, value) => {
+    const updatedList = [...input[type]];
+    updatedList[index][key] = value;
+    setInput({ ...input, [type]: updatedList });
+  };
+
+  const handleAddListItem = (type) => {
+    const newItem =
+      type === "education"
+        ? { degree: "", institution: "" }
+        : { title: "", company: "" };
+    setInput({ ...input, [type]: [...input[type], newItem] });
+  };
+
+  const handleRemoveListItem = (type, index) => {
+    const updatedList = [...input[type]];
+    updatedList.splice(index, 1);
+    setInput({ ...input, [type]: updatedList });
   };
 
   const validateForm = () => {
@@ -68,9 +85,8 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     return newErrors;
   };
 
-  const submitHandler = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -78,60 +94,35 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
     }
 
     const formData = new FormData();
-    formData.append("fullname", input.fullname);
-    formData.append("email", input.email);
-    formData.append("phoneNumber", input.phoneNumber);
-    formData.append("bio", input.bio);
-    formData.append("skills", input.skills);
-    formData.append("dob", input.dob);
-    formData.append("gender", input.gender);
-    formData.append("fatherName", input.fatherName);
-    formData.append("address", input.address);
-    formData.append("city", input.city);
-    formData.append("state", input.state);
-    formData.append("highestQualification", input.highestQualification);
-
-    // Append file if new file selected
-    if (input.file) {
-      formData.append("file", input.file);
-    }
-
-    // Add experience and education if available
-    if (input.experience.length > 0) {
-      formData.append("experience", JSON.stringify(input.experience));
-    }
-    if (input.education.length > 0) {
-      formData.append("education", JSON.stringify(input.education));
+    for (const key in input) {
+      if (key === "file" && input[key]) {
+        formData.append("file", input.file);
+      } else if (Array.isArray(input[key])) {
+        formData.append(key, JSON.stringify(input[key]));
+      } else {
+        formData.append(key, input[key]);
+      }
     }
 
     try {
       setLoading(true);
-      const res = await axios.post(
+      const response = await axios.post(
         `${USER_API_END_POINT}/profile/update`,
         formData,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
           withCredentials: true,
         }
       );
 
-      if (res.data.success) {
-        dispatch(setUser(res.data.user));
-        toast.success(res.data.message);
-        setOpen(false); // Close dialog on success
+      if (response.data.success) {
+        dispatch(setUser(response.data.user));
+        toast.success(response.data.message);
+        setOpen(false);
       }
     } catch (error) {
-      let errorMessage = "Something went wrong.";
-      if (axios.isAxiosError(error)) {
-        if (error?.response?.data?.message) {
-          errorMessage = error.response.data.message;
-        } else {
-          errorMessage = error.response?.statusText || "An error occurred.";
-        }
-      }
-      toast.error(errorMessage);
+      const message = error.response?.data?.message || "An error occurred.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -139,131 +130,161 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
 
   return (
     <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
-      <DialogContent
-        className="sm:max-w-[500px] p-6 bg-white rounded-md shadow-lg"
-        onInteractOutside={() => setOpen(false)}
-      >
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Profile</DialogTitle>
         </DialogHeader>
-        <form onSubmit={submitHandler}>
-          <div className="space-y-4">
-            {/* Full Name Input */}
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="fullname">Full Name</Label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Text Inputs */}
+          {[
+            "fullname",
+            "email",
+            "phoneNumber",
+            "bio",
+            "skills",
+            "dob",
+            "gender",
+            "fatherName",
+            "address",
+            "city",
+            "state",
+            "highestQualification",
+          ].map((field) => (
+            <div key={field} className="flex flex-col gap-1">
+              <Label htmlFor={field}>
+                {field.split(/(?=[A-Z])/).join(" ")}
+              </Label>
               <Input
-                id="fullname"
-                name="fullname"
-                value={input.fullname}
-                onChange={changeEventHandler}
-                placeholder="Enter your full name"
+                id={field}
+                name={field}
+                value={input[field]}
+                onChange={handleChange}
+                placeholder={`Enter your ${field}`}
               />
-              {errors.fullname && (
-                <span className="text-red-500">{errors.fullname}</span>
+              {errors[field] && (
+                <span className="text-red-500">{errors[field]}</span>
               )}
             </div>
+          ))}
 
-            {/* Email Input */}
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                value={input.email}
-                onChange={changeEventHandler}
-                placeholder="Enter your email"
-              />
-              {errors.email && (
-                <span className="text-red-500">{errors.email}</span>
-              )}
-            </div>
-
-            {/* Phone Number Input */}
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="phoneNumber">Phone Number</Label>
-              <Input
-                id="phoneNumber"
-                name="phoneNumber"
-                type="tel"
-                value={input.phoneNumber}
-                onChange={changeEventHandler}
-                placeholder="Enter your phone number"
-              />
-              {errors.phoneNumber && (
-                <span className="text-red-500">{errors.phoneNumber}</span>
-              )}
-            </div>
-
-            {/* Bio Input */}
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="bio">Bio</Label>
-              <Input
-                id="bio"
-                name="bio"
-                value={input.bio}
-                onChange={changeEventHandler}
-                placeholder="Short bio"
-              />
-              {errors.bio && <span className="text-red-500">{errors.bio}</span>}
-            </div>
-
-            {/* Skills Input */}
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="skills">Skills</Label>
-              <Input
-                id="skills"
-                name="skills"
-                value={input.skills}
-                onChange={changeEventHandler}
-                placeholder="Skills (comma-separated)"
-              />
-              {errors.skills && (
-                <span className="text-red-500">{errors.skills}</span>
-              )}
-            </div>
-
-            {/* Date of Birth */}
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="dob">Date of Birth</Label>
-              <Input
-                id="dob"
-                name="dob"
-                type="date"
-                value={input.dob}
-                onChange={changeEventHandler}
-              />
-              {errors.dob && <span className="text-red-500">{errors.dob}</span>}
-            </div>
-
-            {/* Resume Upload */}
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="file">Resume (PDF)</Label>
-              <Input
-                id="file"
-                name="file"
-                type="file"
-                accept="application/pdf"
-                onChange={fileChangeHandler}
-              />
-              {errors.file && (
-                <span className="text-red-500">{errors.file}</span>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <DialogFooter>
-              {loading ? (
-                <Button className="w-full">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please
-                  wait...
+          {/* Education Section */}
+          <div>
+            <Label>Education</Label>
+            {input.education.map((edu, index) => (
+              <div key={index} className="flex gap-2 items-center">
+                <Input
+                  name="degree"
+                  value={edu.degree}
+                  onChange={(e) =>
+                    handleListChange(
+                      "education",
+                      index,
+                      "degree",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Degree"
+                />
+                <Input
+                  name="institution"
+                  value={edu.institution}
+                  onChange={(e) =>
+                    handleListChange(
+                      "education",
+                      index,
+                      "institution",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Institution"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => handleRemoveListItem("education", index)}
+                >
+                  <Trash />
                 </Button>
-              ) : (
-                <Button type="submit" className="w-full">
-                  Update Profile
-                </Button>
-              )}
-            </DialogFooter>
+              </div>
+            ))}
+            <Button
+              type="button"
+              onClick={() => handleAddListItem("education")}
+            >
+              Add Education
+            </Button>
           </div>
+
+          {/* Experience Section */}
+          <div>
+            <Label>Experience</Label>
+            {input.experience.map((exp, index) => (
+              <div key={index} className="flex gap-2 items-center">
+                <Input
+                  name="title"
+                  value={exp.title}
+                  onChange={(e) =>
+                    handleListChange(
+                      "experience",
+                      index,
+                      "title",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Job Title"
+                />
+                <Input
+                  name="company"
+                  value={exp.company}
+                  onChange={(e) =>
+                    handleListChange(
+                      "experience",
+                      index,
+                      "company",
+                      e.target.value
+                    )
+                  }
+                  placeholder="Company"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => handleRemoveListItem("experience", index)}
+                >
+                  <Trash />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              onClick={() => handleAddListItem("experience")}
+            >
+              Add Experience
+            </Button>
+          </div>
+
+          {/* Resume Upload */}
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="file">Resume (PDF)</Label>
+            <Input
+              id="file"
+              name="file"
+              type="file"
+              accept="application/pdf"
+              onChange={handleFileChange}
+            />
+            {errors.file && <span className="text-red-500">{errors.file}</span>}
+          </div>
+
+          <DialogFooter>
+            <Button type="submit" className="w-full">
+              {loading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                "Update Profile"
+              )}
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

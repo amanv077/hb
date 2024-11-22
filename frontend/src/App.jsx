@@ -18,6 +18,7 @@ import ResumeForm from "./components/ResumeForm";
 import StudentList from "./components/students/StudentList";
 import StudentDetails from "./components/students/StudentDetails";
 import Footer from "./components/shared/Footer";
+import Counselor from "./components/Counselor";
 
 // Layout Component for Navbar and Header
 function Layout() {
@@ -69,6 +70,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/counselor",
+        element: <Counselor />,
       },
       // Admin routes
       {

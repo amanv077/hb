@@ -11,10 +11,11 @@ import { toast } from "sonner";
 import logo from "@/assets/logo.jpg";
 
 const Navbar = () => {
-  const { user } = useSelector((store) => store.auth);
+  const { user } = useSelector((store) => store.auth); // Get user from the redux store
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Logout handler function
   const logoutHandler = async () => {
     try {
       const res = await axios.get(`${USER_API_END_POINT}/logout`, {
@@ -85,6 +86,14 @@ const Navbar = () => {
                     Browse
                   </Link>
                 </li>
+                {/* Conditional rendering for "Your Counselor" link */}
+                {user && user.role === "student" && (
+                  <li>
+                    <Link to="/counselor" className="hover:text-[#003b8d]">
+                      Your Counselor
+                    </Link>
+                  </li>
+                )}
               </>
             )}
           </ul>
