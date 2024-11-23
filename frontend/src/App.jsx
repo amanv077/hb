@@ -19,6 +19,7 @@ import StudentList from "./components/students/StudentList";
 import StudentDetails from "./components/students/StudentDetails";
 import Footer from "./components/shared/Footer";
 import Counselor from "./components/Counselor";
+import AboutUs from "./components/AboutUs";
 
 // Layout Component for Navbar and Header
 function Layout() {
@@ -58,6 +59,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/resumeBuilder",
         element: <ResumeForm />,
+      },
+      {
+        path: "/about-us",
+        element: <AboutUs />,
       },
       {
         path: "/description/:id",

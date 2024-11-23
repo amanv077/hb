@@ -12,24 +12,46 @@ import { singleUpload } from "../middlewares/mutler.js";
 
 const router = express.Router();
 
-// Register a new user
-router.route("/register").post(singleUpload, register);
+/**
+ * @route   POST /api/v1/user/register
+ * @desc    Register a new user with profile picture upload
+ * @access  Public
+ */
+router.post("/register", singleUpload, register);
 
-// Login user
-router.route("/login").post(login);
+/**
+ * @route   POST /api/v1/user/login
+ * @desc    Login an existing user
+ * @access  Public
+ */
+router.post("/login", login);
 
-// Logout user
-router.route("/logout").get(logout);
+/**
+ * @route   GET /api/v1/user/logout
+ * @desc    Logout the currently logged-in user
+ * @access  Public (but typically used after authentication)
+ */
+router.get("/logout", logout);
 
-// Update user profile (requires authentication)
-router
-  .route("/profile/update")
-  .post(isAuthenticated, singleUpload, updateProfile);
+/**
+ * @route   POST /api/v1/user/profile/update
+ * @desc    Update the authenticated user's profile
+ * @access  Private (Requires Authentication)
+ */
+router.post("/profile/update", isAuthenticated, singleUpload, updateProfile);
 
-// Delete a user by ID (can be secured based on roles)
-router.route("/user/delete/:userId").delete(isAuthenticated, deleteUser);
+/**
+ * @route   DELETE /api/v1/user/user/delete/:userId
+ * @desc    Delete a user by ID (secured for authorized roles)
+ * @access  Private (Requires Authentication, Role Validation Recommended)
+ */
+router.delete("/user/delete/:userId", isAuthenticated, deleteUser);
 
-// Create a new user (admin or special use case)
-router.route("/user/create").post(isAuthenticated, createUser);
+/**
+ * @route   POST /api/v1/user/user/create
+ * @desc    Create a new user (Admin or special use cases)
+ * @access  Private (Requires Authentication, Role Validation Recommended)
+ */
+router.post("/user/create", isAuthenticated, createUser);
 
 export default router;
