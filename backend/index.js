@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 const corsOptions = {
   origin:
     process.env.NODE_ENV === "production"
-      ? process.env.FRONTEND_URL // Production: Use the frontend URL from .env
+      ? process.env.FRONTEND_URL.split(",") // Production: Use the frontend URL from .env
       : ["http://localhost:5173", "http://127.0.0.1:5173"], // Development: Allow local URLs
   credentials: true, // Allow cookies and authentication headers
 };
@@ -36,6 +36,7 @@ app.use(cors(corsOptions));
 
 // Environment and Port
 const PORT = process.env.PORT || 3000;
+console.log(process.env);
 
 // Root Route (for quick API health check)
 app.get("/", (req, res) => {
