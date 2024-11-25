@@ -26,7 +26,7 @@ const Job = ({ job }) => {
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <p className="text-sm text-gray-500">
+        <p className="text-xs sm:text-sm text-gray-500">
           {daysAgoFunction(job?.createdAt) === 0
             ? "Posted Today"
             : `${daysAgoFunction(job?.createdAt)} days ago`}
@@ -44,20 +44,24 @@ const Job = ({ job }) => {
 
       {/* Company Info */}
       <div className="flex items-center gap-3 my-3">
-        <Avatar className="w-12 h-12 border border-gray-300">
+        <Avatar className="w-10 h-10 sm:w-12 sm:h-12 border border-gray-300">
           <AvatarImage src={job?.company?.logo} alt={job?.company?.name} />
         </Avatar>
         <div>
           <h2 className="font-semibold text-lg text-gray-800">
             {job?.company?.name}
           </h2>
-          <p className="text-sm text-gray-500">{job?.location || "India"}</p>
+          <p className="text-xs sm:text-sm text-gray-500">
+            {job?.location || "India"}
+          </p>
         </div>
       </div>
 
       {/* Job Title and Description */}
       <div>
-        <h1 className="font-bold text-xl text-gray-800 my-2">{job?.title}</h1>
+        <h1 className="font-bold text-lg sm:text-xl text-gray-800 my-2">
+          {job?.title}
+        </h1>
         <p className="text-sm text-gray-600 line-clamp-3">
           {job?.description || "No description available."}
         </p>
@@ -77,7 +81,7 @@ const Job = ({ job }) => {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center gap-4 mt-5">
+      <div className="flex flex-col sm:flex-row items-center gap-4 mt-5">
         <button
           className="w-full sm:w-auto px-4 py-2 text-blue-700 border border-blue-700 rounded hover:bg-blue-50"
           onClick={(e) => {

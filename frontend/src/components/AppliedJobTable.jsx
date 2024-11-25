@@ -15,13 +15,13 @@ const AppliedJobTable = () => {
   const { allAppliedJobs } = useSelector((store) => store.job);
 
   return (
-    <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
-      <Table>
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+      <Table className="w-full text-left">
         <TableCaption className="text-lg font-semibold text-gray-800 mb-4">
           A list of your applied jobs
         </TableCaption>
-        <TableHeader>
-          <TableRow className="text-sm font-semibold text-gray-600 border-b-2 border-gray-200">
+        <TableHeader className="hidden sm:table-header-group">
+          <TableRow className="text-sm font-semibold text-gray-600 border-b border-gray-300">
             <TableHead>Date</TableHead>
             <TableHead>Job Role</TableHead>
             <TableHead>Company</TableHead>
@@ -39,18 +39,44 @@ const AppliedJobTable = () => {
             allAppliedJobs.map((appliedJob) => (
               <TableRow
                 key={appliedJob._id}
-                className="hover:bg-gray-100 cursor-pointer transition-all"
+                className="hover:bg-gray-100 cursor-pointer transition-all border-b border-gray-200 last:border-none"
               >
-                <TableCell className="text-sm text-gray-700">
+                <TableCell className="text-sm text-gray-700 sm:hidden">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-semibold">
+                      {appliedJob.job?.title}
+                    </span>
+                    <span className="text-gray-600 text-sm">
+                      {appliedJob.job?.company?.name}
+                    </span>
+                    <Badge
+                      className={`text-white font-semibold py-1 px-3 rounded-full w-max ${
+                        appliedJob?.status === "rejected"
+                          ? "bg-red-500"
+                          : appliedJob.status === "pending"
+                          ? "bg-yellow-400"
+                          : "bg-green-500"
+                      }`}
+                    >
+                      {appliedJob.status.toUpperCase()}
+                    </Badge>
+                    <span className="text-gray-500 text-sm">
+                      {appliedJob?.createdAt?.split("T")[0]}
+                    </span>
+                  </div>
+                </TableCell>
+
+                {/* Visible on larger screens */}
+                <TableCell className="text-sm text-gray-700 hidden sm:table-cell">
                   {appliedJob?.createdAt?.split("T")[0]}
                 </TableCell>
-                <TableCell className="text-sm font-semibold text-gray-800">
+                <TableCell className="text-sm font-semibold text-gray-800 hidden sm:table-cell">
                   {appliedJob.job?.title}
                 </TableCell>
-                <TableCell className="text-sm text-gray-600">
+                <TableCell className="text-sm text-gray-600 hidden sm:table-cell">
                   {appliedJob.job?.company?.name}
                 </TableCell>
-                <TableCell className="text-sm text-right">
+                <TableCell className="text-sm text-right hidden sm:table-cell">
                   <Badge
                     className={`text-white font-semibold py-1 px-3 rounded-full ${
                       appliedJob?.status === "rejected"

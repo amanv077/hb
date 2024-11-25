@@ -1,21 +1,22 @@
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { Avatar, AvatarImage } from "../ui/avatar";
-import { LogOut, User2 } from "lucide-react";
+import { LogOut, User2, Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import { setUser } from "@/redux/authSlice";
 import { toast } from "sonner";
+import { useState } from "react";
 import logo from "@/assets/logo.jpg";
 
 const Navbar = () => {
-  const { user } = useSelector((store) => store.auth); // Get user from the redux store
+  const { user } = useSelector((store) => store.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Logout handler function
   const logoutHandler = async () => {
     try {
       const res = await axios.get(`${USER_API_END_POINT}/logout`, {
@@ -33,8 +34,9 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-white shadow-sm">
-      <div className="flex items-center justify-between mx-auto max-w-7xl h-16 px-6">
+    <nav className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="flex items-center justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16">
+        {/* Logo */}
         <div>
           <Link to="/">
             <img
@@ -44,7 +46,26 @@ const Navbar = () => {
             />
           </Link>
         </div>
-        <div className="flex items-center gap-10">
+
+        {/* Hamburger Menu for Mobile */}
+        <div className="lg:hidden">
+          {menuOpen ? (
+            <X
+              className="text-[#004aad] cursor-pointer"
+              size={24}
+              onClick={() => setMenuOpen(false)}
+            />
+          ) : (
+            <Menu
+              className="text-[#004aad] cursor-pointer"
+              size={24}
+              onClick={() => setMenuOpen(true)}
+            />
+          )}
+        </div>
+
+        {/* Desktop Menu */}
+        <div className="hidden lg:flex items-center gap-8">
           <ul className="flex items-center gap-6 text-[#004aad] font-semibold">
             {user && user.role === "recruiter" ? (
               <>
@@ -86,7 +107,6 @@ const Navbar = () => {
                     Browse
                   </Link>
                 </li>
-                {/* Conditional rendering for "Your Counselor" link */}
                 {user && user.role === "student" && (
                   <li>
                     <Link to="/counselor" className="hover:text-[#003b8d]">
@@ -97,71 +117,169 @@ const Navbar = () => {
               </>
             )}
           </ul>
-          {!user ? (
-            <div className="flex items-center gap-3">
-              <Link to="/login">
-                <Button
-                  variant="outline"
-                  className="border-[#004aad] text-[#004aad] hover:bg-[#004aad] hover:text-white"
-                >
-                  Login
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button className="bg-[#004aad] hover:bg-[#003b8d] text-white">
-                  Signup
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage
-                    src={user?.profile?.profilePhoto}
-                    alt="User Profile"
-                  />
-                </Avatar>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="">
-                  <div className="flex gap-2 space-y-2">
-                    <Avatar className="cursor-pointer">
-                      <AvatarImage
-                        src={user?.profile?.profilePhoto}
-                        alt="User Profile"
-                      />
-                    </Avatar>
-                    <div>
-                      <h4 className="font-medium">{user?.fullname}</h4>
-                      <p className="text-sm text-gray-500">
-                        {user?.profile?.bio}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col my-2 text-gray-700">
-                    {user && user.role === "student" && (
-                      <div className="flex w-fit items-center gap-2 cursor-pointer">
-                        <User2 />
-                        <Button variant="link">
-                          <Link to="/profile">View Profile</Link>
-                        </Button>
+
+          {/* Auth Buttons */}
+          <div className="flex items-center gap-4">
+            {!user ? (
+              <>
+                <Link to="/login">
+                  <Button
+                    variant="outline"
+                    className="border-[#004aad] text-[#004aad] hover:bg-[#004aad] hover:text-white"
+                  >
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button className="bg-[#004aad] hover:bg-[#003b8d] text-white">
+                    Signup
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage
+                      src={user?.profile?.profilePhoto}
+                      alt="User Profile"
+                    />
+                  </Avatar>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="p-4">
+                    <div className="flex gap-2">
+                      <Avatar>
+                        <AvatarImage
+                          src={user?.profile?.profilePhoto}
+                          alt="User Profile"
+                        />
+                      </Avatar>
+                      <div>
+                        <h4 className="font-medium">{user?.fullname}</h4>
+                        <p className="text-sm text-gray-500">
+                          {user?.profile?.bio}
+                        </p>
                       </div>
-                    )}
-                    <div className="flex w-fit items-center gap-2 cursor-pointer">
-                      <LogOut />
-                      <Button onClick={logoutHandler} variant="link">
+                    </div>
+                    <div className="flex flex-col mt-4">
+                      {user.role === "student" && (
+                        <Link
+                          to="/profile"
+                          className="flex items-center gap-2 text-gray-700 hover:text-black"
+                        >
+                          <User2 />
+                          View Profile
+                        </Link>
+                      )}
+                      <button
+                        className="flex items-center gap-2 text-gray-700 hover:text-black"
+                        onClick={logoutHandler}
+                      >
+                        <LogOut />
                         Logout
-                      </Button>
+                      </button>
                     </div>
                   </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          )}
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div className="absolute top-16 left-0 w-full bg-white shadow-md lg:hidden">
+            <ul className="flex flex-col items-center gap-4 py-4 text-[#004aad] font-semibold">
+              {user && user.role === "recruiter" ? (
+                <>
+                  <li>
+                    <Link
+                      to="/admin/companies"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Companies
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/admin/students"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Students
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/jobs" onClick={() => setMenuOpen(false)}>
+                      Jobs
+                    </Link>
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    <Link to="/" onClick={() => setMenuOpen(false)}>
+                      Home
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/resumeBuilder"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Resume Builder
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/jobs" onClick={() => setMenuOpen(false)}>
+                      Jobs
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/browse" onClick={() => setMenuOpen(false)}>
+                      Browse
+                    </Link>
+                  </li>
+                  {user && user.role === "student" && (
+                    <li>
+                      <Link to="/counselor" onClick={() => setMenuOpen(false)}>
+                        Your Counselor
+                      </Link>
+                    </li>
+                  )}
+                </>
+              )}
+            </ul>
+            <div className="flex flex-col items-center gap-4 py-4">
+              {!user ? (
+                <>
+                  <Link to="/login" onClick={() => setMenuOpen(false)}>
+                    <Button
+                      variant="outline"
+                      className="border-[#004aad] text-[#004aad] hover:bg-[#004aad] hover:text-white w-full"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                  <Link to="/signup" onClick={() => setMenuOpen(false)}>
+                    <Button className="bg-[#004aad] hover:bg-[#003b8d] text-white w-full">
+                      Signup
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <button
+                  className="text-red-500 hover:text-red-600"
+                  onClick={logoutHandler}
+                >
+                  Logout
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </nav>
   );
 };
 

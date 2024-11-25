@@ -64,7 +64,8 @@ const ResumeBuilder = () => {
       doc.setFontSize(12);
       doc.text("Professional Summary", 20, 60);
       doc.setFontSize(10);
-      doc.text(doc.splitTextToSize(formData.summary, 180), 20, 70);
+      const summaryText = doc.splitTextToSize(formData.summary, 180);
+      doc.text(summaryText, 20, 70);
     }
 
     // Education Section
@@ -80,28 +81,40 @@ const ResumeBuilder = () => {
       });
     }
 
-    // Experience Section
+    // Experience Section using autoTable
     if (formData.experience.length) {
+      const experienceData = formData.experience.map((exp) => ({
+        position: exp.position || "Position",
+        company: exp.company || "Company",
+        duration: exp.duration || "Duration",
+        description: exp.description || "Description",
+      }));
+
       doc.setFontSize(12);
       doc.text("Experience", 20, 120);
-      formData.experience.forEach((exp, index) => {
-        doc.setFontSize(10);
-        const expText = `${exp.position || "Position"} at ${
-          exp.company || "Company"
-        } (${exp.duration || "Duration"})`;
-        const desc = exp.description || "Description";
-        doc.text(expText, 20, 130 + index * 20);
-        doc.text(doc.splitTextToSize(desc, 160), 20, 140 + index * 20);
+      autoTable(doc, {
+        startY: 130,
+        head: [["Position", "Company", "Duration", "Description"]],
+        body: experienceData.map((exp) => [
+          exp.position,
+          exp.company,
+          exp.duration,
+          exp.description,
+        ]),
+        styles: {
+          fontSize: 10,
+          cellPadding: 4,
+        },
       });
     }
 
     // Skills Section
     if (formData.skills.length) {
       doc.setFontSize(12);
-      doc.text("Skills", 20, 160);
+      doc.text("Skills", 20, 180);
       formData.skills.forEach((skill, index) => {
         doc.setFontSize(10);
-        doc.text(`${index + 1}. ${skill}`, 20, 170 + index * 10);
+        doc.text(`${index + 1}. ${skill}`, 20, 190 + index * 10);
       });
     }
 

@@ -24,12 +24,16 @@ import AboutUs from "./components/AboutUs";
 // Layout Component for Navbar and Header
 function Layout() {
   return (
-    <div className="layout">
-      <Navbar /> {/* Fixed Navbar */}
-      <main className="content">
+    <div className="flex flex-col min-h-screen">
+      <header>
+        <Navbar /> {/* Fixed Navbar */}
+      </header>
+      <main className="flex-grow px-4 sm:px-6 md:px-8">
         <Outlet /> {/* Dynamic content goes here */}
       </main>
-      <Footer />
+      <footer className="mt-auto">
+        <Footer />
+      </footer>
     </div>
   );
 }

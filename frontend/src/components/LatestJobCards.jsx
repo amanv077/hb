@@ -1,9 +1,17 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Badge } from "./ui/badge";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns"; // Import date formatting function
 
 const LatestJobCards = ({ job }) => {
   const navigate = useNavigate();
+
+  // Format the posted date (assuming job.postedDate is an ISO string)
+  const formattedDate = job?.postedDate
+    ? format(new Date(job?.postedDate), "MMM dd, yyyy")
+    : "N/A";
+
   return (
     <div
       onClick={() => navigate(`/description/${job._id}`)}
@@ -15,9 +23,11 @@ const LatestJobCards = ({ job }) => {
           <h1 className="font-semibold text-lg text-[#004aad]">
             {job?.company?.name}
           </h1>
-          <p className="text-xs text-gray-500">India</p>
+          <p className="text-xs text-gray-500">
+            {job?.location || "India"} {/* Make location dynamic */}
+          </p>
         </div>
-        <p className="text-xs text-gray-400">{job?.postedDate}</p>
+        <p className="text-xs text-gray-400">{formattedDate}</p>
       </div>
 
       {/* Job Title and Description */}

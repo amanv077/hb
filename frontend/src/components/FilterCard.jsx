@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setSearchedQuery } from "@/redux/jobSlice";
 import { Input } from "./ui/input";
@@ -38,7 +38,7 @@ const FilterCard = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-md shadow-md w-full">
+    <div className="bg-white p-4 rounded-md shadow-md w-full sm:w-[100%] md:w-[100%] lg:w-[100%]">
       <h2 className="font-semibold text-xl mb-4">Filter Jobs</h2>
       <div className="space-y-4">
         {/* Job Role */}
@@ -85,22 +85,29 @@ const FilterCard = () => {
           </select>
         </div>
 
-        {/* Posted On */}
+        {/* Posted On (Updated with dynamic options) */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Posted On
+            Posted Within
           </label>
-          <Input
+          <select
             name="postedOn"
-            type="date"
             value={filters.postedOn}
             onChange={handleChange}
-          />
+            className="block w-full border-gray-300 rounded-md"
+          >
+            <option value="">Select Duration</option>
+            <option value="1">1 Day</option>
+            <option value="3">3 Days</option>
+            <option value="7">7 Days</option>
+            <option value="30">1 Month</option>
+            <option value="60">2 Months</option>
+          </select>
         </div>
 
         {/* Salary Range */}
-        <div className="flex gap-2">
-          <div>
+        <div className="flex flex-wrap gap-2">
+          <div className="w-full sm:w-[48%]">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Min Salary
             </label>
@@ -112,7 +119,7 @@ const FilterCard = () => {
               placeholder="e.g., 50000"
             />
           </div>
-          <div>
+          <div className="w-full sm:w-[48%]">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Max Salary
             </label>
@@ -127,11 +134,19 @@ const FilterCard = () => {
         </div>
       </div>
 
-      <div className="mt-6 flex justify-between">
-        <Button variant="outline" onClick={resetFilters}>
+      <div className="mt-6 flex flex-col sm:flex-row sm:justify-between gap-4">
+        <Button
+          variant="outline"
+          onClick={resetFilters}
+          className="w-full sm:w-auto"
+        >
           Reset
         </Button>
-        <Button variant="solid" onClick={applyFilters}>
+        <Button
+          variant="solid"
+          onClick={applyFilters}
+          className="w-full sm:w-auto"
+        >
           Apply Filters
         </Button>
       </div>

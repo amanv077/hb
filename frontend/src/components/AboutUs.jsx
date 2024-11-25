@@ -10,10 +10,10 @@ const AboutUs = () => (
 
 const Header = () => (
   <header className="text-center mb-12">
-    <h1 className="text-5xl font-bold text-[#003b8d] select-none">
+    <h1 className="text-4xl sm:text-5xl font-bold text-[#003b8d] select-none">
       Welcome to HiringBooth
     </h1>
-    <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto select-none">
+    <p className="text-lg sm:text-xl text-gray-600 mt-4 max-w-2xl mx-auto select-none">
       At Hiring-Booth, we are committed to bridging the gap between talent and
       opportunity. Our innovative solutions empower individuals and
       organizations to achieve their goals through recruitment, training, and
@@ -24,7 +24,7 @@ const Header = () => (
 
 const Section = ({ title, children }) => (
   <section className="w-full max-w-5xl mb-12">
-    <h2 className="text-3xl font-semibold text-blue-500 mb-6 select-none">
+    <h2 className="text-3xl sm:text-4xl font-semibold text-blue-500 mb-6 select-none">
       {title}
     </h2>
     {children}
@@ -67,14 +67,14 @@ const Services = () => {
 
   return (
     <Section title="Our Services">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 select-none">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 select-none">
         {services.map(({ title, description, icon }, i) => (
           <div
             key={i}
             className="bg-blue-50 p-6 rounded-lg shadow-lg border-l-4 border-blue-600 hover:shadow-xl transition-shadow"
           >
             <div className="text-4xl mb-4 text-blue-500">{icon}</div>
-            <h3 className="text-xl font-medium text-gray-800 select-none">
+            <h3 className="text-xl sm:text-2xl font-medium text-gray-800 select-none">
               {title}
             </h3>
             <p className="text-gray-600 mt-2 select-none">{description}</p>
@@ -101,10 +101,10 @@ const News = () => {
 
   return (
     <Section title="Latest News">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 select-none">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 select-none">
         {news.map(({ title, content }, i) => (
           <article key={i} className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-xl font-medium text-blue-600 select-none">
+            <h3 className="text-xl sm:text-2xl font-medium text-blue-600 select-none">
               {title}
             </h3>
             <p className="text-gray-600 mt-2 select-none">{content}</p>
@@ -117,12 +117,14 @@ const News = () => {
 
 const Contact = () => (
   <Section title="Contact Us">
-    <div className="flex flex-col md:flex-row justify-between items-start">
+    <div className="flex flex-col sm:flex-row justify-between items-start">
       {/* Contact Details */}
-      <div className="mb-8 md:mb-0 md:w-1/2">
-        <h3 className="text-xl font-medium text-blue-600 mb-4">Get in Touch</h3>
+      <div className="mb-8 sm:mb-0 sm:w-1/2">
+        <h3 className="text-xl sm:text-2xl font-medium text-blue-600 mb-4">
+          Get in Touch
+        </h3>
         <p className="text-gray-600 mb-4">
-          We're here to help! Reach out to us for inquiries, support, or
+          We are here to help! Reach out to us for inquiries, support, or
           collaboration opportunities.
         </p>
         <ul className="space-y-3">
@@ -153,8 +155,8 @@ const Contact = () => (
 );
 
 const ContactForm = () => (
-  <form className="bg-blue-50 p-6 rounded-lg shadow-lg md:w-1/2">
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+  <form className="bg-blue-50 p-6 rounded-lg shadow-lg sm:w-1/2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
       {["Name", "Email"].map((label, i) => (
         <div key={i}>
           <label
