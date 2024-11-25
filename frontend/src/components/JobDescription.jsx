@@ -39,7 +39,9 @@ const JobDescription = () => {
         toast.success(res.data.message);
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(
+        error.response?.data?.message || "Failed to apply for the job."
+      );
     }
   };
 
@@ -58,6 +60,7 @@ const JobDescription = () => {
           );
         }
       } catch (error) {
+        toast.error("Failed to fetch job details.");
         console.error(error);
       }
     };
@@ -65,123 +68,106 @@ const JobDescription = () => {
   }, [jobId, dispatch, user?._id]);
 
   return (
-    <div>
-      <div className="bg-gray-100 min-h-screen py-10">
-        <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-          {/* Back Button */}
-          {/* <button
-         
-          className="text-blue-600 hover:text-blue-800 mb-4 flex items-center gap-2"
+    <div className="bg-gray-50 min-h-screen py-6 px-4 md:px-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md">
+        {/* Back Button */}
+        <Button
+          variant="outline"
+          className="mt-4 ml-4 text-gray-600 border-gray-300 hover:bg-gray-100"
+          onClick={() => navigate(-1)}
         >
-          <span className="material-icons">arrow_back</span> Back
-        </button> */}
-          <Button
-            variant="outline"
-            className="text-gray-600 border-gray-300 hover:bg-gray-100 "
-            onClick={() => navigate(-1)}
-          >
-            Back
-          </Button>
+          Back
+        </Button>
 
-          {/* Header Section */}
-          <div className="flex items-center mb-6">
-            {singleJob?.companyLogo && (
-              <img
-                src={singleJob?.companyLogo}
-                alt={`${singleJob?.companyName} Logo`}
-                className="w-16 h-16 rounded-full object-cover mr-4"
-              />
-            )}
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">
-                {singleJob?.title}
-              </h1>
-              <p className="text-gray-600 text-sm">
-                {singleJob?.companyName || "Unknown Company"}
-              </p>
-            </div>
+        {/* Job Header */}
+        <div className="p-6 border-b border-gray-200 flex flex-col md:flex-row md:items-center gap-6">
+          {singleJob?.company?.logo && (
+            <img
+              src={singleJob.company.logo}
+              alt={`${singleJob.company.name} Logo`}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+          )}
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-gray-800">
+              {singleJob?.title}
+            </h1>
+            <p className="text-gray-600">
+              {singleJob?.company?.name || "Unknown Company"}
+            </p>
           </div>
+        </div>
 
-          {/* Job Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">
-                Job Details
-              </h2>
-              <div className="space-y-4">
-                <p>
-                  <span className="font-medium text-gray-600">Role: </span>
-                  {singleJob?.title}
-                </p>
-                <p>
-                  <span className="font-medium text-gray-600">Location: </span>
-                  {singleJob?.location || "Not specified"}
-                </p>
-                <p>
-                  <span className="font-medium text-gray-600">
-                    Experience:{" "}
-                  </span>
-                  {singleJob?.experience || "0"} years
-                </p>
-                <p>
-                  <span className="font-medium text-gray-600">Salary: </span>₹
-                  {singleJob?.salary || "N/A"} LPA
-                </p>
-                <p>
-                  <span className="font-medium text-gray-600">Job Type: </span>
-                  {singleJob?.jobType}
-                </p>
-                <p>
-                  <span className="font-medium text-gray-600">
-                    Number of Positions:{" "}
-                  </span>
-                  {singleJob?.position}
-                </p>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">
-                About the Job
-              </h2>
-              <p className="text-gray-600 leading-relaxed">
-                {singleJob?.description || "Description not available."}
-              </p>
-            </div>
-          </div>
-
-          {/* Additional Information */}
-          <div className="mt-10">
-            <h2 className="text-lg font-semibold text-gray-700 mb-2">
-              Additional Information
+        {/* Job Details */}
+        <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">
+              Job Details
             </h2>
-            <div className="flex flex-wrap gap-4">
-              <Badge className="bg-blue-100 text-blue-800 font-medium">
-                Total Applicants: {singleJob?.applications?.length || 0}
-              </Badge>
-              <Badge className="bg-green-100 text-green-800 font-medium">
-                Experience Required: {singleJob?.experience || 0} years
-              </Badge>
-              <Badge className="bg-orange-100 text-orange-800 font-medium">
-                {singleJob?.jobType}
-              </Badge>
-            </div>
+            <ul className="space-y-2 text-gray-600">
+              <li>
+                <strong>Role:</strong> {singleJob?.title}
+              </li>
+              <li>
+                <strong>Location:</strong>{" "}
+                {singleJob?.location || "Not specified"}
+              </li>
+              <li>
+                <strong>Experience:</strong> {singleJob?.experienceLevel || 0}{" "}
+                years
+              </li>
+              <li>
+                <strong>Salary:</strong> ₹{singleJob?.salary || "N/A"} LPA
+              </li>
+              <li>
+                <strong>Job Type:</strong> {singleJob?.jobType || "N/A"}
+              </li>
+              <li>
+                <strong>Positions:</strong> {singleJob?.position || "N/A"}
+              </li>
+            </ul>
           </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">
+              About the Job
+            </h2>
+            <p className="text-gray-600 leading-relaxed">
+              {singleJob?.description || "Description not available."}
+            </p>
+          </div>
+        </div>
 
-          {/* Footer with Apply Button */}
-          <div className="mt-10">
-            <Button
-              onClick={isApplied ? null : applyJobHandler}
-              disabled={isApplied}
-              className={`w-full py-3 ${
-                isApplied
-                  ? "bg-gray-400 text-gray-100 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-              } rounded-lg`}
-            >
-              {isApplied ? "Already Applied" : "Apply Now"}
-            </Button>
+        {/* Additional Info */}
+        <div className="p-6 border-t border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+            Additional Information
+          </h2>
+          <div className="flex flex-wrap gap-4">
+            <Badge className="bg-blue-100 text-blue-800">
+              Total Applicants: {singleJob?.applications?.length || 0}
+            </Badge>
+            <Badge className="bg-green-100 text-green-800">
+              Experience Required: {singleJob?.experienceLevel || 0} years
+            </Badge>
+            <Badge className="bg-orange-100 text-orange-800">
+              {singleJob?.jobType}
+            </Badge>
           </div>
+        </div>
+
+        {/* Footer with Apply Button */}
+        <div className="p-6 border-t border-gray-200">
+          <Button
+            onClick={isApplied ? null : applyJobHandler}
+            disabled={isApplied}
+            className={`w-full py-3 ${
+              isApplied
+                ? "bg-gray-400 text-gray-100 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            } rounded-lg`}
+          >
+            {isApplied ? "Already Applied" : "Apply Now"}
+          </Button>
         </div>
       </div>
     </div>

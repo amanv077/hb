@@ -268,12 +268,21 @@ const Navbar = () => {
                   </Link>
                 </>
               ) : (
-                <button
-                  className="text-red-500 hover:text-red-600"
-                  onClick={logoutHandler}
-                >
-                  Logout
-                </button>
+                <div className="w-full text-center flex flex-col gap-2">
+                  <Link
+                    to="/profile"
+                    className="text-[#004aad] font-semibold hover:text-[#003b8d] w-full"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    View Profile
+                  </Link>
+                  <button
+                    className="text-red-500 font-semibold hover:text-red-600 w-full"
+                    onClick={logoutHandler}
+                  >
+                    Logout
+                  </button>
+                </div>
               )}
             </div>
           </div>
