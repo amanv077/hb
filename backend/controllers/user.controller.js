@@ -9,46 +9,87 @@ export const register = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, password, role } = req.body;
 
+    // Check if all fields are provided
     if (!fullname || !email || !phoneNumber || !password || !role) {
       return res.status(400).json({
-        message: "Something is missing",
+        message: "All fields are required.",
         success: false,
       });
     }
 
-    const file = req.file;
-    const fileUri = getDataUri(file);
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-
+    // Check if the user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({
-        message: "User already exists with this email.",
+        message: "A user with this email already exists.",
         success: false,
       });
     }
 
+    // Ensure a file is uploaded (if required)
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Profile photo is required.",
+        success: false,
+      });
+    }
+
+    // Process the file and upload to Cloudinary
+    let cloudResponse;
+    try {
+      const fileUri = getDataUri(req.file);
+      cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+        folder: "user_profiles", // Optional: specify a folder in Cloudinary
+        transformation: { quality: "auto", fetch_format: "auto" }, // Optimize image
+      });
+    } catch (uploadError) {
+      console.error("Cloudinary upload error:", uploadError);
+      return res.status(500).json({
+        message: "Error uploading profile photo. Please try again.",
+        success: false,
+      });
+    }
+
+    // Hash the user's password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    // Create the user in the database
+    const newUser = await User.create({
       fullname,
       email,
       phoneNumber,
       password: hashedPassword,
       role,
       profile: {
-        profilePhoto: cloudResponse.secure_url,
+        profilePhoto: cloudResponse.secure_url, // Save Cloudinary URL
       },
     });
 
     return res.status(201).json({
       message: "Account created successfully.",
+      user: {
+        id: newUser._id,
+        fullname: newUser.fullname,
+        email: newUser.email,
+        role: newUser.role,
+        profile: newUser.profile,
+      },
       success: true,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Registration error:", error);
+
+    // Handle specific errors (e.g., validation, database, etc.)
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        message: "Invalid data. Please check your input.",
+        success: false,
+      });
+    }
+
+    // General server error
     return res.status(500).json({
-      message: "An error occurred during registration.",
+      message: "An error occurred during registration. Please try again later.",
       success: false,
     });
   }
