@@ -11,23 +11,24 @@ const Filter = ({ onSearch }) => {
     experience: "",
   });
 
-  // Normalize filters and handle skill input as an array of skills
+  // Normalize filters and handle skill input as an array
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     let normalizedValue = value.trim().replace(/\s+/g, " "); // Normalize spaces
 
-    // Split skills into an array of skills if the input is for skills
     if (name === "skills") {
-      normalizedValue = normalizedValue
-        .split(",") // Split by commas
-        .map((skill) => skill.trim().toLowerCase()); // Trim and convert to lowercase
+      // Split skills and trim each one
+      normalizedValue = value
+        .split(",")
+        .map((skill) => skill.trim()) // Do not lowercase here, backend handles it
+        .join(","); // Rejoin for clean storage
     }
 
     setFilters((prev) => ({ ...prev, [name]: normalizedValue }));
   };
 
   const handleSearch = () => {
-    onSearch(filters); // Pass updated filters to the parent
+    onSearch(filters); // Pass updated filters to parent component
   };
 
   const handleReset = () => {
@@ -41,7 +42,7 @@ const Filter = ({ onSearch }) => {
       experience: "",
     };
     setFilters(resetFilters);
-    onSearch(resetFilters); // Reset the parent search as well
+    onSearch(resetFilters); // Notify parent component of reset
   };
 
   return (
@@ -92,7 +93,11 @@ const Filter = ({ onSearch }) => {
           type="text"
           name="skills"
           placeholder="Skills (comma-separated)"
-          value={filters.skills}
+          value={
+            Array.isArray(filters.skills)
+              ? filters.skills.join(", ")
+              : filters.skills
+          }
           onChange={handleInputChange}
           className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />

@@ -14,8 +14,6 @@ const userSchema = new mongoose.Schema(
       resumeOriginalName: { type: String }, // Original file name of the resume
       company: { type: mongoose.Schema.Types.ObjectId, ref: "Company" },
       profilePhoto: { type: String, default: "" }, // Profile photo URL
-    },
-    additionalInfo: {
       dob: { type: Date }, // Date of Birth
       gender: { type: String }, // Gender
       fatherName: { type: String },

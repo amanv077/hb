@@ -44,36 +44,46 @@ export const getStudents = async (req, res) => {
       city,
       state,
       skills,
+      mobile,
       experience,
       page = 1,
       limit = 10,
-    } = req.query; // Extract query params
+    } = req.query;
+
     const filters = {};
 
-    // Normalize the filter inputs to lowercase and trim excess spaces
-    if (name) filters.name = new RegExp(name.trim().replace(/\s+/g, " "), "i");
-    if (email) filters.email = new RegExp(email.toLowerCase().trim(), "i");
-    if (city) filters.city = new RegExp(city.toLowerCase().trim(), "i");
-    if (state) filters.state = new RegExp(state.toLowerCase().trim(), "i");
+    // Add filters to the query if provided
+    if (name) filters.name = new RegExp(name.trim(), "i");
+    if (email) filters.email = new RegExp(email.trim(), "i");
+    if (city) filters.city = new RegExp(city.trim(), "i");
+    if (state) filters.state = new RegExp(state.trim(), "i");
+    if (mobile) filters.mobile = new RegExp(mobile.trim(), "i");
 
-    // Handle skills array filter
-    if (skills && skills.length > 0) {
-      const skillsArray = skills
-        .split(",")
-        .map((skill) => skill.trim().toLowerCase()); // Split and normalize
-      filters.skills = { $in: skillsArray }; // MongoDB $in operator to match any skill in the array
+    // Handle skills filtering for mixed-case storage
+    if (skills) {
+      const skillsArray = skills.split(",").map((skill) => skill.trim());
+      filters.skills = {
+        $all: skillsArray.map((skill) => ({
+          $regex: new RegExp(skill, "i"), // Case-insensitive regex for each skill
+        })),
+      };
+    }
+
+    // Handle experience as a numeric filter
+    if (experience) {
+      filters.totalWorkExp = { $gte: parseInt(experience, 10) };
     }
 
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
 
-    // Query database for students with pagination
+    // Query the database with pagination
     const students = await Student.find(filters)
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum);
 
-    const total = await Student.countDocuments(filters); // Total documents
-    const totalPages = Math.ceil(total / limitNum); // Calculate total pages
+    const total = await Student.countDocuments(filters);
+    const totalPages = Math.ceil(total / limitNum);
 
     return res.status(200).json({
       message: "Students fetched successfully.",

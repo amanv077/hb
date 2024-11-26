@@ -1,172 +1,257 @@
 import React, { useState } from "react";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { Contact, Mail, Pen, ChevronDown, ChevronUp } from "lucide-react";
+import { Pen, Check } from "lucide-react";
+import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
 import { Label } from "./ui/label";
 import AppliedJobTable from "./AppliedJobTable";
-import UpdateProfileDialog from "./UpdateProfileDialog";
-import { useSelector } from "react-redux";
-import useGetAppliedJobs from "@/hooks/useGetAppliedJobs";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import { USER_API_END_POINT } from "@/utils/constant";
+import { setUser } from "@/redux/authSlice";
+import { toast } from "sonner";
 
 const Profile = () => {
-  useGetAppliedJobs();
-  const [open, setOpen] = useState(false);
-  const [expandSkills, setExpandSkills] = useState(false);
-  const [expandExperience, setExpandExperience] = useState(false);
-  const [expandEducation, setExpandEducation] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
 
-  const profileImage =
-    user?.profile?.profilePhoto ||
-    "https://via.placeholder.com/150?text=Avatar"; // Fallback image
+  const [input, setInput] = useState({
+    fullname: user?.fullname || "",
+    email: user?.email || "",
+    phoneNumber: user?.phoneNumber || "",
+    bio: user?.profile?.bio || "",
+    dob: user?.profile?.dob || "",
+    gender: user?.profile?.gender || "",
+    fatherName: user?.profile?.fatherName || "",
+    address: user?.profile?.address || "",
+    state: user?.profile?.state || "",
+    city: user?.profile?.city || "",
+    totalWorkExp: user?.profile?.totalWorkExp || "",
+    highestQualificationCategory:
+      user?.profile?.highestQualificationCategory || "",
+    highestQualification: user?.profile?.highestQualification || "",
+    highestQualificationPassedOn:
+      user?.profile?.highestQualificationPassedOn || "",
+    highestQualificationPercentage:
+      user?.profile?.highestQualificationPercentage || "",
+    skills: user?.profile?.skills?.join(", ") || "",
+    education: user?.profile?.education || [],
+    experience: user?.profile?.experience || [],
+    candidate_summary: user?.profile?.candidate_summary || "",
+  });
+
+  const handleChange = (e) => {
+    setInput({ ...input, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await axios.post(
+        `${USER_API_END_POINT}/profile/update`,
+        input,
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        dispatch(setUser(response.data.user));
+        toast.success("Profile updated successfully!");
+        setIsEditing(false);
+      }
+    } catch (error) {
+      toast.error("Failed to update profile. Please try again.");
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      {/* Main Container */}
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6 md:p-8 mt-6">
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-5xl mx-auto">
         {/* Profile Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20 md:h-24 md:w-24">
-              <AvatarImage src={profileImage} alt="Profile Picture" />
-            </Avatar>
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+        <div className="bg-white shadow-md rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-center">
+          <Avatar className="h-24 w-24 rounded-full">
+            <AvatarImage
+              src={
+                user?.profile?.profilePhoto ||
+                "https://via.placeholder.com/150?text=Avatar"
+              }
+              alt="Profile Picture"
+            />
+          </Avatar>
+          <div className="flex-1">
+            {isEditing ? (
+              <Input
+                name="fullname"
+                value={input.fullname}
+                onChange={handleChange}
+                placeholder="Full Name"
+              />
+            ) : (
+              <h1 className="text-2xl font-bold">
                 {user?.fullname || "No Name"}
               </h1>
-              <p className="text-sm text-gray-600">
-                {user?.profile?.bio || "No bio available"}
-              </p>
-            </div>
+            )}
+            <p className="text-gray-600 mt-2">
+              {isEditing ? (
+                <Input
+                  name="bio"
+                  value={input.bio}
+                  onChange={handleChange}
+                  placeholder="Add a short bio..."
+                />
+              ) : (
+                user?.profile?.bio || "No bio available"
+              )}
+            </p>
           </div>
-          {/* Edit Profile Button */}
           <Button
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg text-sm md:text-base shadow-md hover:bg-blue-600"
+            onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
+            className={`px-4 py-2 text-white rounded-lg shadow ${
+              isEditing
+                ? "bg-green-500 hover:bg-green-600"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
           >
-            <Pen className="h-4 w-4 md:h-5 md:w-5" />
-            <span>Edit Profile</span>
+            {isEditing ? (
+              <Check className="w-5 h-5" />
+            ) : (
+              <Pen className="w-5 h-5" />
+            )}
+            {isEditing ? "Save Changes" : "Edit"}
           </Button>
         </div>
 
-        {/* Contact Info */}
-        <div className="mt-6 space-y-4">
-          <div className="flex items-center gap-3 text-gray-700">
-            <Mail className="text-gray-500" />
-            <span>{user?.email || "No email provided"}</span>
-          </div>
-          <div className="flex items-center gap-3 text-gray-700">
-            <Contact className="text-gray-500" />
-            <span>{user?.phoneNumber || "No phone number provided"}</span>
-          </div>
-        </div>
-
-        {/* Skills Section */}
-        <div className="mt-6">
-          <div
-            className="flex items-center justify-between cursor-pointer"
-            onClick={() => setExpandSkills(!expandSkills)}
-          >
-            <h2 className="text-lg font-medium text-gray-800">Skills</h2>
-            {expandSkills ? <ChevronUp /> : <ChevronDown />}
-          </div>
-          {expandSkills && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {user?.profile?.skills?.length > 0 ? (
-                user.profile.skills.map((skill, index) => (
-                  <Badge
-                    key={index}
-                    className="text-blue-600 bg-blue-100 px-3 py-1 rounded-lg text-sm"
-                  >
-                    {skill}
-                  </Badge>
-                ))
+        {/* Contact Information */}
+        <div className="bg-white shadow-md rounded-2xl p-6 mt-6">
+          <h2 className="text-xl font-bold mb-4">Contact Information</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Email</Label>
+              {isEditing ? (
+                <Input
+                  name="email"
+                  value={input.email}
+                  onChange={handleChange}
+                  placeholder="Email"
+                />
               ) : (
-                <span className="text-gray-500">No skills listed</span>
+                <p>{user?.email || "No email provided"}</p>
               )}
             </div>
-          )}
+            <div>
+              <Label>Phone Number</Label>
+              {isEditing ? (
+                <Input
+                  name="phoneNumber"
+                  value={input.phoneNumber}
+                  onChange={handleChange}
+                  placeholder="Phone Number"
+                />
+              ) : (
+                <p>{user?.phoneNumber || "No phone number provided"}</p>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Resume Section */}
-        <div className="mt-6">
-          <Label className="text-md font-medium text-gray-700">Resume</Label>
-          {user?.profile?.resume ? (
-            <a
-              href={user.profile.resume}
-              target="_blank"
-              className="text-blue-500 hover:underline text-sm"
-              rel="noreferrer"
-            >
-              {user.profile.resumeOriginalName}
-            </a>
+        {/* Personal Details */}
+        <div className="bg-white shadow-md rounded-2xl p-6 mt-6">
+          <h2 className="text-xl font-bold mb-4">Personal Details</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label>Gender</Label>
+              {isEditing ? (
+                <Input
+                  name="gender"
+                  value={input.gender}
+                  onChange={handleChange}
+                  placeholder="Gender"
+                />
+              ) : (
+                <p>{user?.profile?.gender || "Not specified"}</p>
+              )}
+            </div>
+            <div>
+              <Label>Date of Birth</Label>
+              {isEditing ? (
+                <Input
+                  name="dob"
+                  value={input.dob}
+                  onChange={handleChange}
+                  type="date"
+                />
+              ) : (
+                <p>{user?.profile?.dob || "Not specified"}</p>
+              )}
+            </div>
+            <div>
+              <Label>Father's Name</Label>
+              {isEditing ? (
+                <Input
+                  name="fatherName"
+                  value={input.fatherName}
+                  onChange={handleChange}
+                  placeholder="Father's Name"
+                />
+              ) : (
+                <p>{user?.profile?.fatherName || "Not specified"}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Education and Work Experience */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="bg-white shadow-md rounded-2xl p-6">
+            <h2 className="text-xl font-bold mb-4">Education</h2>
+            {user?.profile?.education?.map((edu, idx) => (
+              <div key={idx} className="mb-4">
+                <p className="font-bold">{edu.qualification}</p>
+                <p>{edu.institute}</p>
+                <p>
+                  {edu.passedOn}, {edu.percentage}%
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="bg-white shadow-md rounded-2xl p-6">
+            <h2 className="text-xl font-bold mb-4">Work Experience</h2>
+            {user?.profile?.experience?.map((exp, idx) => (
+              <div key={idx} className="mb-4">
+                <p className="font-bold">{exp.designation}</p>
+                <p>{exp.compName}</p>
+                <p>
+                  {exp.startDate} - {exp.endDate || "Present"}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Skills */}
+        <div className="bg-white shadow-md rounded-2xl p-6 mt-6">
+          <h2 className="text-xl font-bold mb-4">Skills</h2>
+          {isEditing ? (
+            <Input
+              name="skills"
+              value={input.skills}
+              onChange={handleChange}
+              placeholder="Comma-separated skills"
+            />
           ) : (
-            <span className="text-gray-500">No resume uploaded</span>
+            <div className="flex flex-wrap gap-2">
+              {user?.profile?.skills?.map((skill, idx) => (
+                <Badge
+                  key={idx}
+                  className="bg-blue-100 text-blue-600 px-3 py-1 rounded-lg"
+                >
+                  {skill}
+                </Badge>
+              ))}
+            </div>
           )}
         </div>
-
-        {/* Experience Section */}
-        {user?.profile?.experience?.length > 0 && (
-          <div className="mt-6">
-            <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => setExpandExperience(!expandExperience)}
-            >
-              <h2 className="text-lg font-medium text-gray-800">Experience</h2>
-              {expandExperience ? <ChevronUp /> : <ChevronDown />}
-            </div>
-            {expandExperience && (
-              <ul className="space-y-4 mt-2">
-                {user.profile.experience.map((exp, index) => (
-                  <li key={index} className="text-gray-700">
-                    <strong>{exp.title}</strong> at {exp.company} -{" "}
-                    <span className="text-gray-500">
-                      {exp.startDate} to {exp.endDate || "Present"}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
-
-        {/* Education Section */}
-        {user?.profile?.education?.length > 0 && (
-          <div className="mt-6">
-            <div
-              className="flex items-center justify-between cursor-pointer"
-              onClick={() => setExpandEducation(!expandEducation)}
-            >
-              <h2 className="text-lg font-medium text-gray-800">Education</h2>
-              {expandEducation ? <ChevronUp /> : <ChevronDown />}
-            </div>
-            {expandEducation && (
-              <ul className="space-y-4 mt-2">
-                {user.profile.education.map((edu, index) => (
-                  <li key={index} className="text-gray-700">
-                    <strong>{edu.degree}</strong> from {edu.institution} -{" "}
-                    <span className="text-gray-500">
-                      {edu.startYear} to {edu.endYear || "Present"}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
       </div>
-
-      {/* Applied Jobs Section */}
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6 md:p-8 mt-6">
-        <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">
-          Applied Jobs
-        </h2>
-        <AppliedJobTable />
-      </div>
-
-      {/* Update Profile Dialog */}
-      <UpdateProfileDialog open={open} setOpen={setOpen} />
     </div>
   );
 };
