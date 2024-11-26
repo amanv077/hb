@@ -20,6 +20,7 @@ import StudentDetails from "./components/students/StudentDetails";
 import Footer from "./components/shared/Footer";
 import Counselor from "./components/Counselor";
 import AboutUs from "./components/AboutUs";
+import ContactUs from "./components/ContactUs";
 
 // Layout Component for Navbar and Header
 function Layout() {
@@ -67,6 +68,10 @@ const appRouter = createBrowserRouter([
       {
         path: "/about-us",
         element: <AboutUs />,
+      },
+      {
+        path: "/contact",
+        element: <ContactUs />,
       },
       {
         path: "/description/:id",

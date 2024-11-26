@@ -76,23 +76,20 @@ const StudentList = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 ">
-      <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row">
+      <div
+        className={`max-w-7xl mx-auto px-4 py-8 flex flex-col ${
+          selectedStudent ? "" : "lg:flex-row"
+        }`}
+      >
         {/* Filter Section */}
-        <div className="lg:w-1/5 w-full mr-10 mb-6 lg:mb-0">
-          <Filter onSearch={handleSearch} />
-        </div>
+        {!selectedStudent && (
+          <div className="lg:w-1/5 w-full mr-10 mb-6 lg:mb-0">
+            <Filter onSearch={handleSearch} />
+          </div>
+        )}
 
-        {/* Student List Section */}
-        <div className="lg:w-2/3 w-full">
-          {/* <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800">
-              Student Directory
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Browse through our list of students and find your match.
-            </p>
-          </div> */}
-
+        {/* Content Section */}
+        <div className={`${selectedStudent ? "w-full" : "lg:w-2/3 w-full"}`}>
           {loading ? (
             <div className="text-center py-16">
               <div className="animate-spin text-blue-600" role="status">
