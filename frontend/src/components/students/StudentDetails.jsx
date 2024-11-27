@@ -173,6 +173,12 @@ const StudentDetails = ({ student, onBack }) => {
             </div>
           )}
         </div>
+        <button
+          className="bg-blue-600 text-white py-2 px-6 rounded-lg mb-6 hover:bg-blue-700 transition"
+          onClick={onBack}
+        >
+          &larr; Back
+        </button>
       </div>
     </div>
   );

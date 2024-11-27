@@ -202,29 +202,40 @@ const Profile = () => {
 
         {/* Education and Work Experience */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          {/* Education Section */}
           <div className="bg-white shadow-md rounded-2xl p-6">
             <h2 className="text-xl font-bold mb-4">Education</h2>
-            {user?.profile?.education?.map((edu, idx) => (
-              <div key={idx} className="mb-4">
-                <p className="font-bold">{edu.qualification}</p>
-                <p>{edu.institute}</p>
-                <p>
-                  {edu.passedOn}, {edu.percentage}%
-                </p>
-              </div>
-            ))}
+            {user?.profile?.education?.length > 0 ? (
+              user.profile.education.map((edu, idx) => (
+                <div key={idx} className="mb-4">
+                  <p className="font-bold">{edu.qualification || "N/A"}</p>
+                  <p>{edu.institute || "N/A"}</p>
+                  <p>
+                    {edu.passedOn || "N/A"}, {edu.percentage || "N/A"}%
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p>No education details available.</p>
+            )}
           </div>
+
+          {/* Work Experience Section */}
           <div className="bg-white shadow-md rounded-2xl p-6">
             <h2 className="text-xl font-bold mb-4">Work Experience</h2>
-            {user?.profile?.experience?.map((exp, idx) => (
-              <div key={idx} className="mb-4">
-                <p className="font-bold">{exp.designation}</p>
-                <p>{exp.compName}</p>
-                <p>
-                  {exp.startDate} - {exp.endDate || "Present"}
-                </p>
-              </div>
-            ))}
+            {user?.profile?.experience?.length > 0 ? (
+              user.profile.experience.map((exp, idx) => (
+                <div key={idx} className="mb-4">
+                  <p className="font-bold">{exp.designation || "N/A"}</p>
+                  <p>{exp.compName || "N/A"}</p>
+                  <p>
+                    {exp.startDate || "N/A"} - {exp.endDate || "Present"}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p>No work experience details available.</p>
+            )}
           </div>
         </div>
 
