@@ -21,6 +21,8 @@ import Footer from "./components/shared/Footer";
 import Counselor from "./components/Counselor";
 import AboutUs from "./components/AboutUs";
 import ContactUs from "./components/ContactUs";
+import CandidateList from "./components/admin/Candidates/CandidateList";
+import CreateCandidate from "./components/admin/Candidates/CreateCandidate";
 
 // Layout Component for Navbar and Header
 function Layout() {
@@ -111,6 +113,22 @@ const appRouter = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <CompanySetup />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/candidate",
+        element: (
+          <ProtectedRoute>
+            <CandidateList />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/create-candidate",
+        element: (
+          <ProtectedRoute>
+            <CreateCandidate />
           </ProtectedRoute>
         ),
       },

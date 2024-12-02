@@ -80,6 +80,11 @@ const Navbar = () => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/admin/candidate" className="hover:text-[#003b8d]">
+                    Candidate
+                  </Link>
+                </li>
+                <li>
                   <Link to="/admin/jobs" className="hover:text-[#003b8d]">
                     Jobs
                   </Link>
@@ -207,6 +212,14 @@ const Navbar = () => {
                       onClick={() => setMenuOpen(false)}
                     >
                       Students
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/admin/candidate"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Candidate
                     </Link>
                   </li>
                   <li>
