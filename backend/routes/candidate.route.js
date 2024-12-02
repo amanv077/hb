@@ -11,12 +11,12 @@ import {
 const router = express.Router();
 
 // Register a new candidate (requires authentication)
-router.route("/register").post(isAuthenticated, createCandidate);
+router.route("/register").post(createCandidate);
 
 // Get all candidates (no authentication required)
 router.route("/").get(getCandidates);
 
-// Get a candidate by ID (no authentication required for this action)
+// Get a candidate by ID (authentication not required for fetching data)
 router.route("/:id").get(getCandidateById);
 
 // Update candidate information (requires authentication)

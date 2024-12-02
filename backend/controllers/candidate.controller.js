@@ -81,8 +81,19 @@ export const getCandidates = async (req, res) => {
 export const getCandidateById = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Validate the ID format (optional but recommended for better error handling)
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        message: "Invalid candidate ID format.",
+        success: false,
+      });
+    }
+
+    // Find the candidate by ID
     const candidate = await Candidate.findById(id);
 
+    // Check if candidate exists
     if (!candidate) {
       return res.status(404).json({
         message: "Candidate not found.",
@@ -90,12 +101,16 @@ export const getCandidateById = async (req, res) => {
       });
     }
 
+    // Respond with candidate data
     return res.status(200).json({
       candidate,
       success: true,
     });
   } catch (error) {
+    // Log error details for debugging
     console.error("Error fetching candidate by ID:", error);
+
+    // Return a 500 error if something goes wrong
     return res.status(500).json({
       message: "An error occurred while fetching the candidate.",
       success: false,

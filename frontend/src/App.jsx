@@ -23,6 +23,7 @@ import AboutUs from "./components/AboutUs";
 import ContactUs from "./components/ContactUs";
 import CandidateList from "./components/admin/Candidates/CandidateList";
 import CreateCandidate from "./components/admin/Candidates/CreateCandidate";
+import CandidateDetail from "./components/admin/Candidates/CandidateDetail";
 
 // Layout Component for Navbar and Header
 function Layout() {
@@ -129,6 +130,22 @@ const appRouter = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <CreateCandidate />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/admin/create-candidate",
+        element: (
+          <ProtectedRoute>
+            <CreateCandidate />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "/candidate-detail/:id",
+        element: (
+          <ProtectedRoute>
+            <CandidateDetail />
           </ProtectedRoute>
         ),
       },
