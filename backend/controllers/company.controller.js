@@ -5,33 +5,41 @@ import cloudinary from "../utils/cloudinary.js";
 export const registerCompany = async (req, res) => {
   try {
     const { companyName } = req.body;
+
+    if (!req.id) {
+      return res.status(401).json({
+        message: "User authentication required",
+        success: false,
+      });
+    }
+
     if (!companyName) {
       return res.status(400).json({
-        message: "Company name is required.",
+        message: "Company name is required",
         success: false,
       });
     }
-    let company = await Company.findOne({ name: companyName });
-    if (company) {
-      return res.status(400).json({
-        message: "You can't register same company.",
-        success: false,
-      });
-    }
-    company = await Company.create({
+
+    const newCompany = await Company.create({
       name: companyName,
-      userId: req.id,
+      userId: req.id, // Use authenticated user's ID
     });
 
-    return res.status(201).json({
-      message: "Company registered successfully.",
-      company,
+    res.status(201).json({
       success: true,
+      message: "Company registered successfully",
+      company: newCompany,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
+
 export const getCompany = async (req, res) => {
   try {
     const userId = req.id; // logged in user id
