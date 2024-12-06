@@ -12,13 +12,13 @@ import { singleUpload } from "../middlewares/mutler.js"; // Ensure the multer mi
 const router = express.Router();
 
 // Register a new company
-router.route("/register").post(isAuthenticated, registerCompany);
+router.route("/register").post(registerCompany);
 
 // Get all companies of the authenticated user
-router.route("/get").get(isAuthenticated, getCompany);
+router.route("/get").get(getCompany);
 
 // Get company by ID
-router.route("/get/:id").get(isAuthenticated, getCompanyById);
+router.route("/get/:id").get(getCompanyById);
 
 // Update company info (with file upload)
 router.route("/update/:id").put(isAuthenticated, singleUpload, updateCompany);

@@ -1,34 +1,33 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const Filter = ({ onSearch }) => {
   const [filters, setFilters] = useState({
     name: "",
     city: "",
     state: "",
-    email: "",
-    mobile: "",
+    designation: "",
+    compName: "",
     skills: "",
     experience: "",
   });
 
-  // Normalize filters and handle skill input as an array
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    let normalizedValue = value.trim().replace(/\s+/g, " "); // Normalize spaces
-
-    if (name === "skills") {
-      // Split skills and trim each one
-      normalizedValue = value
-        .split(",")
-        .map((skill) => skill.trim()) // Do not lowercase here, backend handles it
-        .join(","); // Rejoin for clean storage
-    }
-
-    setFilters((prev) => ({ ...prev, [name]: normalizedValue }));
+    setFilters((prev) => ({ ...prev, [name]: value.trim() }));
   };
 
   const handleSearch = () => {
-    onSearch(filters); // Pass updated filters to parent component
+    // Normalize filters for smooth keyword matching
+    const normalizedFilters = {
+      ...filters,
+      skills: filters.skills
+        ? filters.skills
+            .split(",")
+            .map((skill) => skill.trim())
+            .join(",")
+        : "",
+    };
+    onSearch(normalizedFilters);
   };
 
   const handleReset = () => {
@@ -36,13 +35,13 @@ const Filter = ({ onSearch }) => {
       name: "",
       city: "",
       state: "",
-      email: "",
-      mobile: "",
+      designation: "",
+      compName: "",
       skills: "",
       experience: "",
     };
     setFilters(resetFilters);
-    onSearch(resetFilters); // Notify parent component of reset
+    onSearch(resetFilters);
   };
 
   return (
@@ -75,17 +74,17 @@ const Filter = ({ onSearch }) => {
         />
         <input
           type="text"
-          name="email"
-          placeholder="Email"
-          value={filters.email}
+          name="designation"
+          placeholder="Designation"
+          value={filters.designation}
           onChange={handleInputChange}
           className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
         <input
           type="text"
-          name="mobile"
-          placeholder="Phone Number"
-          value={filters.mobile}
+          name="compName"
+          placeholder="Company"
+          value={filters.compName}
           onChange={handleInputChange}
           className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
@@ -93,11 +92,7 @@ const Filter = ({ onSearch }) => {
           type="text"
           name="skills"
           placeholder="Skills (comma-separated)"
-          value={
-            Array.isArray(filters.skills)
-              ? filters.skills.join(", ")
-              : filters.skills
-          }
+          value={filters.skills}
           onChange={handleInputChange}
           className="p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
         />
